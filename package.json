@@ -1,8 +1,17 @@
 {
     "name": "@animaru/graphiplay",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Embeddable GraphQL playground — schema explorer, CodeMirror editor, collections, history. Drop into any page via CDN or use as a React component.",
     "license": "MIT",
+    "author": "Animaru",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AnimaruTeam/graphiplay.git"
+    },
+    "homepage": "https://github.com/AnimaruTeam/graphiplay#readme",
+    "bugs": {
+        "url": "https://github.com/AnimaruTeam/graphiplay/issues"
+    },
     "publishConfig": {
         "access": "public"
     },
