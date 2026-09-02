@@ -1,0 +1,208 @@
+.kind {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1.6;
+    flex-shrink: 0;
+}
+.kind.compact {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    font-size: 10.5px;
+}
+.query {
+    color: var(--query);
+    background: var(--query-soft);
+}
+.mutation {
+    color: var(--mutation);
+    background: var(--mutation-soft);
+}
+.subscription {
+    color: var(--subscription);
+    background: var(--subscription-soft);
+}
+
+.input {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: var(--radius-s);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    outline: none;
+    transition: border-color var(--dur);
+}
+.input::placeholder {
+    color: var(--text-3);
+}
+.input:hover {
+    border-color: var(--text-3);
+}
+.input:focus {
+    border-color: var(--accent);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.fieldLabel {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+}
+.fieldHint {
+    font-size: 11.5px;
+    color: var(--text-3);
+}
+
+.kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--text-2);
+}
+
+.switch {
+    position: relative;
+    width: 30px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--border-strong);
+    transition: background var(--dur) var(--ease-out);
+    flex-shrink: 0;
+}
+.switchOn {
+    background: var(--accent);
+}
+.switch:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.checkbox {
+    display: inline-grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--accent-fg);
+    flex-shrink: 0;
+    transition:
+        background var(--dur-fast),
+        border-color var(--dur-fast);
+}
+.checkbox:hover {
+    border-color: var(--accent);
+}
+.checkboxOn {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.checkbox :global(svg) {
+    width: 11px;
+    height: 11px;
+    stroke-width: 3;
+}
+.checkbox:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+.knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.25s var(--ease-spring);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.switchOn .knob {
+    transform: translateX(12px);
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    padding: 40px 24px;
+    color: var(--text-2);
+    animation: fadeUp 0.35s var(--ease-out);
+}
+.emptyIcon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-l);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    margin-bottom: 6px;
+}
+.emptyIcon :global(svg) {
+    width: 18px;
+    height: 18px;
+}
+.emptyTitle {
+    font-weight: 600;
+    color: var(--text);
+}
+.emptyDescription {
+    font-size: 12px;
+    line-height: 1.5;
+    max-width: 260px;
+}
+.emptyAction {
+    margin-top: 8px;
+}
+
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}

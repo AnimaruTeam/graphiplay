@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Graphiplay — CDN example</title>
+        <!-- Optional: the playground is designed for Inter + JetBrains Mono and falls back to system fonts. -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <!-- On a real page use the CDN build:
+             <link rel="stylesheet" href="https://unpkg.com/@animaru/graphiplay/dist/graphiplay.css" />
+             <script src="https://unpkg.com/@animaru/graphiplay/dist/graphiplay.min.js"></script> -->
+        <link rel="stylesheet" href="../dist/graphiplay.css" />
+        <style>
+            body {
+                margin: 0;
+                font-family: system-ui, sans-serif;
+                background: #fafafa;
+            }
+            header {
+                padding: 12px 20px;
+                border-bottom: 1px solid #ddd;
+            }
+            /* The playground fills whatever box you give it. */
+            #playground {
+                height: calc(100vh - 49px);
+            }
+        </style>
+    </head>
+    <body>
+        <header>My API docs — try it live below</header>
+        <div id="playground"></div>
+
+        <script src="../dist/graphiplay.min.js"></script>
+        <script>
+            Graphiplay.mount("#playground", {
+                endpoint: "https://countries.trevorblades.com/graphql",
+                headers: { "x-example": "cdn" },
+                theme: "system",
+                defaultQuery: "query Countries {\n  countries {\n    code\n    name\n  }\n}",
+            })
+        </script>
+    </body>
+</html>

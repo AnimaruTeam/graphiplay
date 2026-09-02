@@ -1,0 +1,347 @@
+/* Name | address bar | actions. The bar fills everything between the name and the actions, so
+   its edges line up with the rail (left) and the workspace (right) instead of floating. */
+.bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 52px;
+    padding: 0 8px 0 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+    z-index: 20;
+}
+
+.brand {
+    flex-shrink: 0;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+}
+
+.center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.urlBox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    padding: 0 4px 0 12px;
+    border-radius: var(--radius-m);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    transition:
+        border-color var(--dur),
+        background var(--dur);
+}
+.urlBox:hover {
+    border-color: var(--border-strong);
+}
+.urlBox:focus-within {
+    background: var(--surface);
+    border-color: var(--accent);
+}
+.statusDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-3);
+    flex-shrink: 0;
+    transition: background var(--dur);
+}
+.ok .statusDot {
+    background: var(--success);
+}
+.error .statusDot {
+    background: var(--danger);
+}
+.loading .statusDot {
+    background: var(--accent);
+    animation: blink 1s ease-in-out infinite;
+}
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.35;
+    }
+}
+.urlInput {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0;
+    outline: none;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text);
+}
+.urlInput::placeholder {
+    color: var(--text-3);
+    font-family: var(--font-ui);
+}
+.urlActions {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.statusText {
+    flex-shrink: 0;
+    padding-right: 6px;
+    border-right: 1px solid var(--border);
+    font-size: 11.5px;
+    color: var(--text-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 260px;
+}
+.status_error {
+    color: var(--danger);
+}
+.status_ok {
+    color: var(--text-3);
+}
+.spin {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.right {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.paletteBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 6px 0 9px;
+    margin-right: 6px;
+    border-radius: var(--radius-s);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition:
+        background var(--dur),
+        color var(--dur),
+        border-color var(--dur);
+}
+.paletteBtn:hover {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--border-strong);
+}
+.paletteBtn > :global(svg) {
+    width: 14px;
+    height: 14px;
+}
+.paletteText {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+.paletteText > span {
+    font-size: 12px;
+    margin-right: 6px;
+}
+
+.themeSwitch {
+    display: inline-flex;
+    padding: 2px;
+    margin: 0 6px;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+.themeOption {
+    width: 26px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    color: var(--text-3);
+    transition:
+        background var(--dur),
+        color var(--dur);
+}
+.themeOption :global(svg) {
+    width: 14px;
+    height: 14px;
+}
+.themeOption:hover {
+    color: var(--text);
+}
+.themeOptionActive {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.menu {
+    position: absolute;
+    top: 34px;
+    right: -4px;
+    width: 360px;
+    padding: 6px;
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-popover);
+    z-index: 50;
+    transform-origin: top right;
+}
+.menuTitle {
+    padding: 6px 10px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+}
+.menuEmpty {
+    padding: 8px 10px 10px;
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.5;
+}
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: var(--radius-s);
+    padding-right: 4px;
+    transition: background var(--dur-fast);
+}
+.menuItem:hover {
+    background: var(--hover);
+}
+.menuItemActive {
+    background: var(--accent-soft);
+}
+.menuItemMain {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 7px 10px;
+    text-align: left;
+}
+.menuItemName {
+    font-size: 12.5px;
+    font-weight: 500;
+}
+.menuItemUrl {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.menuItemMeta {
+    font-size: 10.5px;
+    color: var(--text-3);
+}
+
+/* --- narrow desktop / tablet: shed decoration in stages so the URL keeps its room ------- */
+
+/* 1. Schema status becomes dot-only (still in the dot's tooltip). */
+@media (max-width: 1320px) {
+    .statusText {
+        display: none;
+    }
+}
+/* 2. Search becomes an icon button. */
+@media (max-width: 1000px) {
+    .paletteBtn {
+        width: 30px;
+        padding: 0;
+        margin-right: 2px;
+        justify-content: center;
+    }
+    .paletteText {
+        display: none;
+    }
+}
+/* 3. Reload is icon-only (label dropped in TopBar.tsx), shortcuts button goes. */
+@media (max-width: 900px) {
+    .bar {
+        gap: 8px;
+        padding: 0 10px;
+    }
+    .center .reload {
+        width: 32px;
+        padding: 0;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .right .desktopOnly {
+        display: none;
+    }
+    .themeSwitch {
+        margin: 0 2px;
+    }
+}
+
+/* --- phone: brand + actions on top, URL on its own row --------------------- */
+
+@media (max-width: 767px) {
+    .bar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "brand right"
+            "center center";
+        height: auto;
+        gap: 0 8px;
+        padding: 6px 10px 8px 12px;
+    }
+    .brand {
+        grid-area: brand;
+        display: flex;
+        align-items: center;
+        height: 36px;
+    }
+    .right {
+        grid-area: right;
+    }
+    .center {
+        grid-area: center;
+        gap: 6px;
+    }
+    .urlBox {
+        max-width: none;
+        height: 38px;
+    }
+    .urlInput {
+        font-size: 13px;
+    }
+    .center .reload {
+        width: 38px;
+        height: 38px;
+    }
+    .menu {
+        width: min(360px, calc(100vw - 80px));
+    }
+}

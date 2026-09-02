@@ -1,0 +1,592 @@
+/* ---------------------------------------------------------------------------
+   Design tokens. Neutral surfaces, one violet accent (Animaru), flat — no glass,
+   no gradients. Everything is scoped to the `.graphiplay` root (see app/root.ts) so the library
+   can be dropped into any page; themes switch on `.graphiplay[data-theme="light|dark"]`.
+   --------------------------------------------------------------------------- */
+
+.graphiplay {
+    --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --radius-s: 6px;
+    --radius-m: 8px;
+    --radius-l: 10px;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur-fast: 120ms;
+    --dur: 180ms;
+}
+
+.graphiplay,
+.graphiplay[data-theme="light"] {
+    color-scheme: light;
+
+    --bg: #f4f4f5;
+    --surface: #ffffff;
+    --surface-2: #f4f4f5;
+    --surface-3: #ebebed;
+    --hover: rgba(24, 24, 27, 0.05);
+    --active: rgba(24, 24, 27, 0.08);
+    --border: #e4e4e7;
+    --border-strong: #d4d4d8;
+
+    --text: #18181b;
+    --text-2: #52525b;
+    --text-3: #7d7d87;
+
+    --accent: #6b47d1;
+    --accent-hover: #5d3bc0;
+    --accent-fg: #ffffff;
+    --accent-soft: rgba(107, 71, 209, 0.1);
+    --accent-ring: rgba(107, 71, 209, 0.28);
+
+    --query: #0e7490;
+    --mutation: #c2410c;
+    --subscription: #be3d8d;
+    --query-soft: rgba(14, 116, 144, 0.1);
+    --mutation-soft: rgba(194, 65, 12, 0.1);
+    --subscription-soft: rgba(190, 61, 141, 0.1);
+
+    --success: #15803d;
+    --success-soft: rgba(21, 128, 61, 0.1);
+    --danger: #dc2f3f;
+    --danger-soft: rgba(220, 47, 63, 0.1);
+    --warning: #b45309;
+    --warning-soft: rgba(180, 83, 9, 0.12);
+
+    --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08);
+    --backdrop: rgba(24, 24, 27, 0.4);
+
+    /* syntax */
+    --syn-keyword: #6b47d1;
+    --syn-type: #0e7490;
+    --syn-variable: #b45309;
+    --syn-field: #18181b;
+    --syn-arg: #5b5bd6;
+    --syn-enum: #c2410c;
+    --syn-string: #15803d;
+    --syn-number: #c2410c;
+    --syn-bool: #be3d8d;
+    --syn-comment: #8a8a94;
+    --syn-directive: #be3d8d;
+    --syn-punct: #71717a;
+    --syn-key: #4338ca;
+    --syn-selection: rgba(107, 71, 209, 0.14);
+    --syn-active-line: rgba(24, 24, 27, 0.03);
+    --syn-cursor: #6b47d1;
+    --syn-match: rgba(107, 71, 209, 0.2);
+}
+
+.graphiplay[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #131315;
+    --surface: #1a1a1d;
+    --surface-2: #212124;
+    --surface-3: #29292d;
+    --hover: rgba(255, 255, 255, 0.05);
+    --active: rgba(255, 255, 255, 0.08);
+    --border: #2a2a2e;
+    --border-strong: #3a3a40;
+
+    --text: #ededf0;
+    --text-2: #a4a4ad;
+    --text-3: #77777f;
+
+    --accent: #8e6cf5;
+    --accent-hover: #9d80f7;
+    --accent-fg: #ffffff;
+    --accent-soft: rgba(142, 108, 245, 0.16);
+    --accent-ring: rgba(142, 108, 245, 0.35);
+
+    --query: #4fc3d6;
+    --mutation: #f2955f;
+    --subscription: #ec7fc0;
+    --query-soft: rgba(79, 195, 214, 0.12);
+    --mutation-soft: rgba(242, 149, 95, 0.12);
+    --subscription-soft: rgba(236, 127, 192, 0.12);
+
+    --success: #4ade80;
+    --success-soft: rgba(74, 222, 128, 0.12);
+    --danger: #f0616f;
+    --danger-soft: rgba(240, 97, 111, 0.12);
+    --warning: #f5b544;
+    --warning-soft: rgba(245, 181, 68, 0.12);
+
+    --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --backdrop: rgba(0, 0, 0, 0.55);
+
+    --syn-keyword: #b39cff;
+    --syn-type: #6fd3e3;
+    --syn-variable: #f5c96a;
+    --syn-field: #ededf0;
+    --syn-arg: #b4b8ff;
+    --syn-enum: #f2955f;
+    --syn-string: #8be3a5;
+    --syn-number: #f2955f;
+    --syn-bool: #ec7fc0;
+    --syn-comment: #6c6c75;
+    --syn-directive: #ec7fc0;
+    --syn-punct: #8a8a94;
+    --syn-key: #9fc2ff;
+    --syn-selection: rgba(142, 108, 245, 0.22);
+    --syn-active-line: rgba(255, 255, 255, 0.03);
+    --syn-cursor: #b39cff;
+    --syn-match: rgba(142, 108, 245, 0.3);
+}
+
+/* --- reset ------------------------------------------------------------------
+   Scoped to the mount node through :where(), which adds no specificity: `:where(.graphiplay)
+   button` weighs (0,0,1) like the old unscoped `button`, so single-class component rules
+   (.primary, .md, .itemHead, .scroll…) keep winning over the reset. */
+
+.graphiplay,
+:where(.graphiplay) *,
+:where(.graphiplay) *::before,
+:where(.graphiplay) *::after {
+    box-sizing: border-box;
+}
+.graphiplay {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+}
+:where(.graphiplay) button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+:where(.graphiplay) button:disabled {
+    cursor: not-allowed;
+}
+:where(.graphiplay) input,
+:where(.graphiplay) select,
+:where(.graphiplay) textarea {
+    font: inherit;
+    color: inherit;
+}
+:where(.graphiplay) a {
+    color: var(--accent);
+    text-decoration: none;
+}
+:where(.graphiplay) h1,
+:where(.graphiplay) h2,
+:where(.graphiplay) h3,
+:where(.graphiplay) p {
+    margin: 0;
+}
+:where(.graphiplay) :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+:where(.graphiplay) ::selection {
+    background: var(--syn-selection);
+}
+@media (prefers-reduced-motion: reduce) {
+    :where(.graphiplay) *,
+    :where(.graphiplay) *::before,
+    :where(.graphiplay) *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+/* Touch: no 300ms double-tap-to-zoom delay on controls. */
+@media (hover: none) and (pointer: coarse) {
+    :where(.graphiplay) button,
+    :where(.graphiplay) input,
+    :where(.graphiplay) select {
+        touch-action: manipulation;
+    }
+}
+/* --- scrollbars ---------------------------------------------------------------- */
+:where(.graphiplay) * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+}
+:where(.graphiplay) *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+:where(.graphiplay) *::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+}
+:where(.graphiplay) *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-3);
+}
+:where(.graphiplay) *::-webkit-scrollbar-track {
+    background: transparent;
+}
+/* --- CodeMirror ---------------------------------------------------------------- */
+.graphiplay .cm-editor {
+    height: 100%;
+    font-size: 13px;
+    outline: none !important;
+}
+.graphiplay .cm-scroller {
+    font-family: var(--font-mono) !important;
+    line-height: 1.6;
+}
+.graphiplay .cm-content {
+    padding: 8px 0 !important;
+    caret-color: var(--syn-cursor);
+}
+.graphiplay .cm-line {
+    padding: 0 12px 0 4px !important;
+}
+.graphiplay .cm-gutters {
+    background: transparent !important;
+    color: var(--text-3) !important;
+    border: 0 !important;
+    padding-left: 6px;
+    user-select: none;
+}
+.graphiplay .cm-lineNumbers .cm-gutterElement {
+    min-width: 32px;
+    padding-right: 10px;
+}
+.graphiplay .cm-activeLine {
+    background: var(--syn-active-line) !important;
+}
+.graphiplay .cm-activeLineGutter {
+    background: transparent !important;
+    color: var(--text-2) !important;
+}
+.graphiplay .cm-selectionBackground,
+.graphiplay .cm-editor ::selection,
+.graphiplay .cm-editor.cm-focused .cm-selectionBackground {
+    background: var(--syn-selection) !important;
+}
+.graphiplay .cm-cursor,
+.graphiplay .cm-dropCursor {
+    border-left-color: var(--syn-cursor) !important;
+    border-left-width: 2px !important;
+}
+.graphiplay .cm-matchingBracket {
+    background: var(--syn-match) !important;
+    border-radius: 2px;
+    outline: none !important;
+}
+.graphiplay .cm-selectionMatch {
+    background: var(--syn-match) !important;
+    border-radius: 2px;
+}
+.graphiplay .cm-placeholder {
+    color: var(--text-3) !important;
+    font-style: normal !important;
+}
+.graphiplay .cm-foldGutter .cm-gutterElement {
+    cursor: pointer;
+    color: var(--text-3);
+    transition: color var(--dur-fast);
+}
+.graphiplay .cm-foldGutter .cm-gutterElement:hover {
+    color: var(--text);
+}
+.graphiplay .cm-foldPlaceholder {
+    background: var(--accent-soft) !important;
+    border: 0 !important;
+    color: var(--accent) !important;
+    border-radius: 4px;
+    padding: 0 6px !important;
+    margin: 0 2px;
+}
+.graphiplay .cm-tooltip {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-m) !important;
+    box-shadow: var(--shadow-popover);
+    color: var(--text);
+    font-family: var(--font-mono);
+    overflow: hidden;
+}
+.graphiplay .cm-tooltip.cm-tooltip-autocomplete > ul {
+    font-family: var(--font-mono) !important;
+    max-height: 260px;
+}
+.graphiplay .cm-tooltip.cm-tooltip-autocomplete > ul > li {
+    padding: 4px 10px !important;
+    transition: background var(--dur-fast);
+}
+.graphiplay .cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected] {
+    background: var(--accent-soft) !important;
+    color: var(--text) !important;
+}
+.graphiplay .cm-completionIcon {
+    opacity: 0.6;
+}
+.graphiplay .cm-completionDetail {
+    color: var(--text-3);
+    font-style: normal !important;
+    margin-left: 8px;
+}
+.graphiplay .cm-completionInfo {
+    padding: 10px 12px !important;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--text-2);
+}
+.graphiplay .cm-tooltip.cm-tooltip-hover {
+    max-width: min(480px, 70vw);
+}
+/* --- hover docs (cm6-graphql) -------------------------------------------------- */
+.graphiplay .cm-gql-hover {
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    max-height: 360px;
+    overflow: auto;
+}
+.graphiplay .cm-gql-hover-head {
+    font-family: var(--font-mono);
+    color: var(--text);
+    word-break: break-word;
+}
+.graphiplay .cm-gql-hover-desc {
+    margin-top: 6px;
+    font-family: var(--font-ui);
+    color: var(--text-2);
+}
+.graphiplay .md > * + * {
+    margin-top: 6px;
+}
+/* --- markdown descriptions ----------------------------------------------------- */
+.graphiplay .md p,
+.graphiplay .md h1,
+.graphiplay .md h2,
+.graphiplay .md h3,
+.graphiplay .md h4,
+.graphiplay .md h5,
+.graphiplay .md h6 {
+    margin: 0;
+}
+.graphiplay .md h1,
+.graphiplay .md h2,
+.graphiplay .md h3,
+.graphiplay .md h4,
+.graphiplay .md h5,
+.graphiplay .md h6 {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+}
+.graphiplay .md strong {
+    font-weight: 600;
+    color: var(--text);
+}
+.graphiplay .md code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: var(--surface-3);
+    color: var(--text);
+}
+.graphiplay .md pre {
+    margin: 0;
+    padding: 6px 8px;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    overflow: auto;
+    white-space: pre;
+}
+.graphiplay .md pre code {
+    padding: 0;
+    background: none;
+    font-size: 11.5px;
+    line-height: 1.5;
+}
+.graphiplay .md ul,
+.graphiplay .md ol {
+    margin: 0;
+    padding-left: 18px;
+}
+.graphiplay .md li + li {
+    margin-top: 2px;
+}
+.graphiplay .md blockquote {
+    margin: 0;
+    padding: 2px 10px;
+    border-left: 2px solid var(--border-strong);
+    color: var(--text-3);
+}
+.graphiplay .md hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 8px 0;
+}
+.graphiplay .md a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: var(--accent-ring);
+    text-underline-offset: 2px;
+}
+.graphiplay .md del {
+    color: var(--text-3);
+}
+.graphiplay .cm-gql-hover-meta {
+    margin-top: 6px;
+    font-family: var(--font-ui);
+    color: var(--text-3);
+}
+.graphiplay .cm-gql-hover-code {
+    font-family: var(--font-mono);
+    color: var(--text-2);
+}
+.graphiplay .cm-gql-hover-deprecated {
+    margin-top: 6px;
+    font-family: var(--font-ui);
+    color: var(--warning);
+}
+.graphiplay .cm-gql-hover-section {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+.graphiplay .cm-gql-hover-sectionTitle {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+.graphiplay .cm-gql-hover-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono);
+}
+.graphiplay .cm-gql-hover-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 6px;
+    padding: 1px 6px;
+    margin: 0 -6px;
+    border-radius: 4px;
+}
+.graphiplay .cm-gql-hover-item-active {
+    background: var(--accent-soft);
+}
+.graphiplay .cm-gql-hover-item-deprecated > :first-child {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+.graphiplay .cm-gql-hover-itemDesc {
+    flex: 1 1 100%;
+    font-family: var(--font-ui);
+    color: var(--text-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.graphiplay .cm-gql-hover-typeName {
+    color: var(--syn-type);
+}
+.graphiplay .cm-gql-hover-field {
+    color: var(--syn-field);
+}
+.graphiplay .cm-gql-hover-arg {
+    color: var(--syn-arg);
+}
+.graphiplay .cm-gql-hover-enum {
+    color: var(--syn-enum);
+}
+.graphiplay .cm-gql-hover-variable {
+    color: var(--syn-variable);
+}
+.graphiplay .cm-gql-hover-directive {
+    color: var(--syn-directive);
+}
+.graphiplay .cm-gql-hover-keyword {
+    color: var(--syn-keyword);
+}
+.graphiplay .cm-gql-hover-punct {
+    color: var(--syn-punct);
+}
+.graphiplay .cm-gql-hover-link {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}
+.graphiplay .cm-gql-hover-link:hover {
+    color: var(--accent);
+}
+.graphiplay .cm-diagnostic {
+    padding: 6px 10px !important;
+    font-family: var(--font-ui);
+}
+.graphiplay .cm-diagnostic-error {
+    border-left-color: var(--danger) !important;
+}
+.graphiplay .cm-lintRange-error {
+    background-image: none !important;
+    text-decoration: underline wavy var(--danger);
+    text-underline-offset: 3px;
+}
+.graphiplay .cm-diagnostic-warning {
+    border-left-color: var(--warning) !important;
+}
+.graphiplay .cm-lintRange-warning {
+    background-image: none !important;
+    text-decoration: underline wavy var(--warning);
+    text-underline-offset: 3px;
+}
+.graphiplay .cm-lintRange-warning.cm-lintRange-unused {
+    text-decoration: underline dotted var(--text-3);
+    color: var(--text-3);
+}
+.graphiplay .cm-diagnosticAction {
+    background: var(--accent) !important;
+    color: var(--accent-fg, #fff) !important;
+    border-radius: 4px !important;
+    padding: 2px 8px !important;
+    margin-left: 8px !important;
+    font-size: 11px;
+}
+.graphiplay .cm-panels {
+    background: var(--surface-2) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+.graphiplay .cm-panel.cm-search {
+    padding: 6px 8px !important;
+    font-family: var(--font-ui);
+    font-size: 12px;
+}
+.graphiplay .cm-panel.cm-search input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    color: var(--text);
+    padding: 3px 8px;
+}
+.graphiplay .cm-panel.cm-search button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    padding: 3px 8px;
+    margin: 0 2px;
+    color: var(--text-2);
+}
+.graphiplay .cm-panel.cm-search label {
+    color: var(--text-2);
+}

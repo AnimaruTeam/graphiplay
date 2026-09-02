@@ -1,0 +1,84 @@
+/* Fills whatever the host gives it; the standalone page makes #root the full viewport. */
+.app {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* --- splash ----------------------------------------------------------------- */
+
+.splash {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: var(--bg);
+}
+.splashLogo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--accent);
+    display: grid;
+    place-items: center;
+}
+.splashLogo span {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-right-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+.splashText {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-2);
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- shell ------------------------------------------------------------------ */
+
+.shell {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+.content {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    gap: 8px;
+    padding: 8px 8px 8px 0;
+}
+
+/* Phone: rail moves to the bottom (see Rail.module.css), sidebar overlays the workspace. */
+@media (max-width: 767px) {
+    .main {
+        flex-direction: column;
+    }
+    .content {
+        position: relative;
+        padding: 0;
+        gap: 0;
+    }
+}

@@ -1,0 +1,148 @@
+.rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 48px;
+    padding: 8px 0;
+    /* Above the sidebar so hover tooltips are not covered by it. */
+    position: relative;
+    z-index: 10;
+}
+
+.item {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-s);
+    color: var(--text-2);
+    transition:
+        color var(--dur),
+        transform var(--dur) var(--ease-spring);
+}
+.item:hover {
+    color: var(--text);
+}
+.item:hover .tooltip {
+    opacity: 1;
+    transform: translateX(0) translateY(-50%);
+}
+.item:active {
+    transform: scale(0.94);
+}
+.item.active {
+    color: var(--accent);
+}
+.activeBg {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-s);
+    background: var(--accent-soft);
+}
+.icon {
+    position: relative;
+    display: inline-flex;
+    z-index: 1;
+}
+.icon :global(svg) {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.75;
+}
+.caption {
+    display: none;
+}
+.badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-size: 9.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+.tooltip {
+    position: absolute;
+    left: 42px;
+    top: 50%;
+    transform: translateX(-4px) translateY(-50%);
+    padding: 4px 8px;
+    border-radius: var(--radius-s);
+    background: var(--text);
+    color: var(--bg);
+    font-size: 11.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+        opacity var(--dur-fast),
+        transform var(--dur) var(--ease-out);
+    z-index: 30;
+}
+/* Touch: a tap leaves :hover stuck on the item, so the tooltip would never go away. */
+@media (hover: none) {
+    .tooltip {
+        display: none;
+    }
+}
+
+/* Phone: bottom navigation bar with captions. */
+@media (max-width: 767px) {
+    .rail {
+        order: 2;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-around;
+        gap: 0;
+        width: auto;
+        padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--border);
+        background: var(--surface);
+    }
+    .item {
+        flex: 1 1 0;
+        min-width: 0;
+        width: auto;
+        height: 50px;
+        flex-direction: column;
+        gap: 3px;
+    }
+    .item:active {
+        transform: none;
+    }
+    .icon :global(svg) {
+        width: 20px;
+        height: 20px;
+    }
+    .caption {
+        position: relative;
+        z-index: 1;
+        display: block;
+        max-width: 100%;
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .badge {
+        top: 4px;
+        right: calc(50% - 18px);
+    }
+    .tooltip {
+        display: none;
+    }
+}

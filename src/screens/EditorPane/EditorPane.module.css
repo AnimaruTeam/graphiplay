@@ -1,0 +1,240 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    /* The pane can be anywhere from ~300px (stacked tablet) to half a desktop; the toolbar adapts
+       to the pane, not the viewport (see @container rules below). */
+    container-type: inline-size;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    height: 44px;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.spacer {
+    flex: 1;
+}
+
+.runWrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.run {
+    min-width: 88px;
+}
+.runHint {
+    display: flex;
+    gap: 3px;
+}
+
+.opPicker {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    margin-left: 8px;
+    padding: 0 8px 0 10px;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-size: 11.5px;
+    color: var(--text-3);
+}
+.opPicker select {
+    appearance: none;
+    background: none;
+    border: 0;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding-right: 16px;
+    cursor: pointer;
+}
+.opPicker select option {
+    background: var(--surface);
+}
+.opPicker :global(svg) {
+    position: absolute;
+    right: 8px;
+    width: 13px;
+    height: 13px;
+    pointer-events: none;
+}
+
+.linkedLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 6px;
+    padding: 3px 8px 3px 4px;
+    border-radius: var(--radius-s);
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.editor {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.bottom {
+    position: relative;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border);
+}
+
+.resizer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -4px;
+    height: 7px;
+    cursor: row-resize;
+    z-index: 5;
+}
+.resizer::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 3px;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.resizer:hover::after,
+:global(.graphiplay).resizing .resizer::after {
+    opacity: 0.7;
+}
+
+:global(.graphiplay).resizing {
+    cursor: row-resize;
+    user-select: none;
+}
+.bottomTabs {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding: 0 8px 0 6px;
+    background: var(--surface-2);
+}
+.bottomTab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: var(--radius-s);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    transition:
+        background var(--dur-fast),
+        color var(--dur-fast);
+}
+.bottomTab :global(svg) {
+    width: 13px;
+    height: 13px;
+}
+.bottomTab:hover {
+    color: var(--text);
+    background: var(--hover);
+}
+.bottomTabActive {
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--border);
+}
+.count {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.warnDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--warning);
+}
+
+.bottomBody {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+}
+.bottomInner {
+    display: flex;
+    flex-direction: column;
+}
+.bottomInner > * {
+    flex: 1;
+    min-height: 0;
+}
+.headersScroll {
+    overflow: auto;
+}
+
+/* Phone: Run lives in the Workspace switcher, so the toolbar starts with the operation picker. */
+@media (max-width: 767px) {
+    .toolbar {
+        height: 40px;
+        padding: 0 6px;
+    }
+    .opPicker {
+        margin-left: 0;
+    }
+}
+
+/* --- toolbar by pane width ---------------------------------------------------- */
+
+@container (max-width: 560px) {
+    .runHint {
+        display: none;
+    }
+    .opPicker > span {
+        display: none;
+    }
+    .linkedLabel {
+        max-width: 120px;
+    }
+}
+@container (max-width: 420px) {
+    .linkedLabel {
+        display: none;
+    }
+    .opPicker {
+        max-width: 45cqw;
+    }
+    .opPicker select {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

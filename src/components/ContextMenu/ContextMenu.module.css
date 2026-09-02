@@ -1,0 +1,102 @@
+.menu {
+    position: fixed;
+    z-index: 150;
+    min-width: 200px;
+    max-width: 300px;
+    padding: 4px;
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-popover);
+    transform-origin: top left;
+    user-select: none;
+}
+
+.itemWrap {
+    position: relative;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: var(--radius-s);
+    font-size: 12.5px;
+    color: var(--text);
+    text-align: left;
+    transition: background var(--dur-fast);
+}
+.item:hover:not(:disabled),
+.itemOpen {
+    background: var(--hover);
+}
+.item:disabled {
+    opacity: 0.45;
+}
+.danger {
+    color: var(--danger);
+}
+.danger:hover:not(:disabled) {
+    background: var(--danger-soft);
+}
+
+.check {
+    width: 16px;
+    display: inline-flex;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent);
+}
+.check :global(svg) {
+    width: 13px;
+    height: 13px;
+}
+.icon {
+    width: 16px;
+    display: inline-flex;
+    justify-content: center;
+    color: var(--text-2);
+    flex-shrink: 0;
+}
+.danger .icon {
+    color: inherit;
+}
+.icon :global(svg) {
+    width: 14px;
+    height: 14px;
+}
+.label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.hint {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+}
+.chevron {
+    width: 13px;
+    height: 13px;
+    color: var(--text-3);
+    flex-shrink: 0;
+}
+
+.separator {
+    height: 1px;
+    margin: 4px 6px;
+    background: var(--border);
+}
+
+/* Touch: keyboard shortcut hints are noise. */
+@media (hover: none) {
+    .hint {
+        display: none;
+    }
+}

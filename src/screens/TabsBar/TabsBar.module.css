@@ -1,0 +1,206 @@
+.bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 42px;
+    padding: 0 8px 0 6px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    flex-shrink: 0;
+}
+
+.scroll {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    padding: 4px 0;
+}
+.scroll::-webkit-scrollbar {
+    display: none;
+}
+.add {
+    flex-shrink: 0;
+}
+.endSlot {
+    flex: 1;
+    min-width: 24px;
+    align-self: stretch;
+    position: relative;
+}
+.endSlotActive::before,
+.dropBefore::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: -2px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+}
+.tab.dropBefore {
+    overflow: visible;
+}
+
+.tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    border-radius: var(--radius-s);
+    flex-shrink: 0;
+    overflow: hidden;
+    color: var(--text-2);
+    cursor: grab;
+    transition: color var(--dur);
+}
+.tab:active {
+    cursor: grabbing;
+}
+.inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+.menuDot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.tab:hover {
+    color: var(--text);
+    background: var(--hover);
+}
+.tab.active {
+    color: var(--text);
+}
+.activeBg {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-s);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.main {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 100%;
+    padding: 0 4px 0 8px;
+    max-width: 220px;
+}
+.title {
+    font-size: 12.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rename {
+    width: 130px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    font-size: 12.5px;
+    outline: none;
+}
+
+.emptyDot {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: var(--surface-3);
+    flex-shrink: 0;
+}
+.pulse {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: radial-gradient(circle, var(--accent) 0 30%, transparent 32%);
+    animation: pulse 1s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+.linked {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--success);
+    flex-shrink: 0;
+}
+
+.close {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+    border-radius: 4px;
+    color: var(--text-3);
+    opacity: 0;
+    transition:
+        opacity var(--dur-fast),
+        background var(--dur-fast),
+        color var(--dur-fast);
+}
+.close :global(svg) {
+    width: 12px;
+    height: 12px;
+}
+.tab:hover .close,
+.tab.active .close {
+    opacity: 1;
+}
+.close:hover {
+    background: var(--active);
+    color: var(--text);
+}
+
+/* Touch: no text-selection / callout bubble while long-pressing for the menu. */
+@media (hover: none) {
+    .inner {
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .bar {
+        height: 44px;
+        padding: 0 6px;
+    }
+    .tab {
+        height: 32px;
+    }
+    .main {
+        max-width: 160px;
+        padding-left: 10px;
+    }
+    .rename {
+        width: 110px;
+    }
+}

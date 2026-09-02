@@ -1,0 +1,237 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.toolbar {
+    padding: 10px 10px 6px;
+}
+.searchBox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    transition:
+        border-color var(--dur),
+        background var(--dur);
+}
+.searchBox:focus-within {
+    background: var(--surface);
+    border-color: var(--accent);
+}
+.searchBox :global(svg) {
+    width: 14px;
+    height: 14px;
+    color: var(--text-3);
+}
+.searchBox input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0;
+    outline: none;
+    font-size: 12.5px;
+    color: var(--text);
+}
+.searchBox input::placeholder {
+    color: var(--text-3);
+}
+.clear {
+    display: inline-flex;
+    color: var(--text-3);
+}
+.clear:hover {
+    color: var(--text);
+}
+
+.chips {
+    display: flex;
+    gap: 4px;
+    padding: 4px 10px 8px;
+}
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 500;
+    text-transform: capitalize;
+    color: var(--text-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    transition:
+        background var(--dur),
+        color var(--dur),
+        border-color var(--dur);
+}
+.chip:hover {
+    background: var(--surface-3);
+    color: var(--text);
+}
+.chipCount {
+    font-size: 10px;
+    opacity: 0.7;
+    font-family: var(--font-mono);
+}
+.chipActive.chip_all {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: transparent;
+}
+.chipActive.chip_query {
+    background: var(--query-soft);
+    color: var(--query);
+    border-color: transparent;
+}
+.chipActive.chip_mutation {
+    background: var(--mutation-soft);
+    color: var(--mutation);
+    border-color: transparent;
+}
+.chipActive.chip_subscription {
+    background: var(--subscription-soft);
+    color: var(--subscription);
+    border-color: transparent;
+}
+
+.list {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 0 8px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.item {
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition:
+        background 0.18s,
+        border-color 0.18s;
+}
+.item:hover {
+    background: var(--hover);
+}
+.itemOpen {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+.itemHead {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 7px 8px;
+    text-align: left;
+}
+.chevron {
+    width: 13px;
+    height: 13px;
+    color: var(--text-3);
+    transition: transform 0.25s var(--ease-spring);
+    flex-shrink: 0;
+}
+.chevronOpen {
+    transform: rotate(90deg);
+}
+.name {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.args {
+    font-size: 10.5px;
+    color: var(--text-3);
+    white-space: nowrap;
+}
+.ret {
+    margin-left: auto;
+    font-size: 11.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.ret :global(button),
+.ret :global(span) {
+    font-size: 11.5px !important;
+}
+
+.body {
+    overflow: hidden;
+}
+.bodyInner {
+    padding: 2px 10px 10px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.desc {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.argList {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.argRow {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+.argName {
+    color: var(--syn-arg);
+}
+.colon {
+    color: var(--text-3);
+}
+
+.preview {
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+.preview :global(.cm-content) {
+    padding: 6px 8px !important;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.actions > :first-child {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    border: 0 !important;
+}
+.docsLink {
+    align-self: flex-start;
+    font-size: 11.5px;
+    color: var(--text-2);
+    transition: color 0.15s;
+}
+.docsLink:hover {
+    color: var(--accent);
+}

@@ -1,0 +1,168 @@
+.workspace {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    overflow: hidden;
+}
+
+.split {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+.editor {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+.response {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.divider {
+    width: 7px;
+    margin: 0 -3px;
+    z-index: 3;
+    cursor: col-resize;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.divider span {
+    width: 1px;
+    background: var(--border);
+    transition: background var(--dur);
+}
+.divider:hover span,
+:global(.graphiplay).resizing .divider span {
+    background: var(--accent);
+}
+
+:global(.graphiplay).resizing {
+    cursor: col-resize;
+    user-select: none;
+}
+
+/* Narrow workspace (tablet, sidebar open): response below the editor, divider becomes a row. */
+.stacked {
+    flex-direction: column;
+}
+.stacked .divider {
+    width: auto;
+    height: 7px;
+    margin: -3px 0;
+    cursor: row-resize;
+    flex-direction: column;
+}
+.stacked .divider span {
+    width: auto;
+    height: 1px;
+}
+:global(.graphiplay).resizingRow .divider span {
+    background: var(--accent);
+}
+:global(.graphiplay).resizingRow {
+    cursor: row-resize;
+    user-select: none;
+}
+
+/* --- phone: Query / Response switcher -------------------------------------- */
+
+.switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 8px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.switcherSpacer {
+    flex: 1;
+}
+.segment {
+    display: inline-flex;
+    padding: 2px;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+.segmentBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-2);
+    transition:
+        background var(--dur),
+        color var(--dur);
+}
+.segmentActive {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+.dotSuccess {
+    background: var(--success);
+}
+.dotError {
+    background: var(--danger);
+}
+.dotLive {
+    background: var(--accent);
+    animation: blink 1s ease-in-out infinite;
+}
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.35;
+    }
+}
+
+.viewport {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+.track {
+    display: flex;
+    width: 200%;
+    height: 100%;
+}
+.view {
+    flex: 0 0 50%;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 767px) {
+    .workspace {
+        border: 0;
+        border-radius: 0;
+    }
+}

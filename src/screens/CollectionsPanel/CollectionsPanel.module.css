@@ -1,0 +1,255 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.toolbar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 10px 8px;
+}
+
+.list {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 0 8px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.block {
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition:
+        border-color 0.18s,
+        background 0.18s;
+}
+.block:hover {
+    background: var(--hover);
+}
+.blockDroppable {
+    border-style: dashed;
+    border-color: var(--border-strong);
+}
+.blockOver {
+    border-style: solid;
+    border-color: var(--c);
+    background: color-mix(in srgb, var(--c) 10%, transparent);
+}
+.blockOver .blockHead {
+    color: var(--text);
+}
+.blockOver * {
+    pointer-events: none; /* keep dragenter/leave stable while hovering children */
+}
+
+.newZone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 16px 12px;
+    border-radius: 10px;
+    border: 1px dashed var(--border-strong);
+    color: var(--text-2);
+    font-size: 12.5px;
+    transition:
+        border-color var(--dur),
+        background var(--dur),
+        color var(--dur);
+}
+.newZone :global(svg) {
+    width: 15px;
+    height: 15px;
+}
+.newZoneOver {
+    border-style: solid;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.newZoneOver * {
+    pointer-events: none;
+}
+
+.blockHead {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 4px;
+}
+.blockToggle {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px;
+    text-align: left;
+}
+.chevron {
+    width: 13px;
+    height: 13px;
+    color: var(--text-3);
+    transition: transform 0.25s var(--ease-spring);
+    flex-shrink: 0;
+}
+.chevronOpen {
+    transform: rotate(90deg);
+}
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.blockName {
+    font-weight: 600;
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.blockCount {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+}
+.blockActions {
+    position: relative;
+}
+
+.menu {
+    position: absolute;
+    right: 0;
+    top: 28px;
+    z-index: 20;
+    min-width: 180px;
+    padding: 4px;
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-popover);
+    display: flex;
+    flex-direction: column;
+    transform-origin: top right;
+}
+.menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: var(--radius-s);
+    font-size: 12.5px;
+    color: var(--text);
+    text-align: left;
+    transition: background var(--dur-fast);
+}
+.menu button:hover {
+    background: var(--hover);
+}
+.menu button :global(svg) {
+    width: 14px;
+    height: 14px;
+}
+.menuDanger {
+    color: var(--danger) !important;
+}
+.menuDanger:hover {
+    background: var(--danger-soft) !important;
+}
+
+.items {
+    overflow: hidden;
+}
+.itemsInner {
+    padding: 0 4px 6px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.emptyItems {
+    padding: 4px 8px 8px;
+    color: var(--text-3);
+    font-size: 12px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    position: relative;
+    transition: background 0.15s;
+}
+.item::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--c);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.item:hover {
+    background: var(--hover);
+}
+.itemActive {
+    background: var(--active);
+}
+.itemActive::before {
+    opacity: 1;
+}
+.item:hover .itemActions {
+    opacity: 1;
+    transform: translateX(0);
+}
+.itemMain {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    text-align: left;
+}
+.itemName {
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--font-mono);
+}
+.openDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    flex-shrink: 0;
+}
+.itemActions {
+    display: flex;
+    gap: 1px;
+    padding-right: 4px;
+    opacity: 0;
+    transform: translateX(4px);
+    transition:
+        opacity 0.18s,
+        transform 0.25s var(--ease-spring);
+}
+
+/* Touch: there is no hover to reveal row actions, so keep them visible. */
+@media (hover: none) {
+    .itemActions {
+        opacity: 1;
+        transform: none;
+    }
+}

@@ -1,0 +1,16 @@
+/* Standalone page only (index.html): the playground owns the whole viewport. */
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+}
+body {
+    overflow: hidden;
+    /* App-like feel on touch: no pull-to-refresh over the editor. */
+    overscroll-behavior: none;
+}
+#root {
+    height: 100vh;
+    height: 100dvh;
+}

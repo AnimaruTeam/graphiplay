@@ -1,0 +1,213 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.colors {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.color {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--c);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    border: 2px solid transparent;
+    transition:
+        transform 0.25s var(--ease-spring),
+        box-shadow 0.2s,
+        border-color 0.2s;
+}
+.color :global(svg) {
+    width: 14px;
+    height: 14px;
+    stroke-width: 3;
+}
+.color:hover {
+    transform: scale(1.08);
+}
+.colorActive {
+    border-color: var(--surface);
+    box-shadow: 0 0 0 2px var(--c);
+}
+
+.collectionList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 220px;
+    overflow: auto;
+    padding: 4px;
+    margin: -4px;
+}
+.collectionOption {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+    text-align: left;
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        color 0.15s,
+        transform 0.2s var(--ease-spring);
+}
+.collectionOption :global(svg) {
+    width: 15px;
+    height: 15px;
+    color: var(--text-3);
+}
+.collectionOption:hover {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+}
+.collectionOptionActive {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+.dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.newCollection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-m);
+    background: var(--surface-2);
+    border: 1px dashed var(--border-strong);
+}
+
+.readonly {
+    opacity: 0.7;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+}
+
+.segmented {
+    display: flex;
+    padding: 3px;
+    border-radius: var(--radius-s);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+.segment {
+    flex: 1;
+    height: 30px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-2);
+    transition:
+        background var(--dur),
+        color var(--dur),
+        box-shadow var(--dur);
+}
+.segment:hover {
+    color: var(--text);
+}
+.segmentActive {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.note {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.5;
+}
+
+.valueArea {
+    width: 100%;
+    height: min(52vh, 420px);
+    min-height: 160px;
+    resize: vertical;
+    padding: 10px 12px;
+    border-radius: var(--radius-s);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    outline: none;
+    overflow-wrap: anywhere;
+    transition: border-color var(--dur);
+}
+.valueArea:focus {
+    border-color: var(--accent);
+}
+.valueArea:read-only {
+    color: var(--text-2);
+}
+.valueMeta {
+    margin-top: 6px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-3);
+    text-align: right;
+}
+
+.switchRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+.switchLabel {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text);
+}
+.switchHint {
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: var(--text-3);
+    line-height: 1.4;
+}
+.note code {
+    font-family: var(--font-mono);
+    color: var(--accent);
+}
+
+.shortcuts {
+    display: flex;
+    flex-direction: column;
+}
+.shortcut {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text);
+}
+.shortcut:last-child {
+    border-bottom: 0;
+}
+.keys {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
