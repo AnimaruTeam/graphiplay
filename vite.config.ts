@@ -7,6 +7,7 @@ import pkg from "./package.json"
 /** Standalone playground page (index.html → site/). The library build is vite.lib.config.ts. */
 export default defineConfig({
     plugins: [react()],
+    base: process.env.SITE_BASE ?? "/",
     resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
     define: { __GRAPHIPLAY_VERSION__: JSON.stringify(pkg.version) },
     build: { outDir: "site" },

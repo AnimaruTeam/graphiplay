@@ -18,13 +18,9 @@ export const WELCOME_QUERY = `# Welcome to Graphiplay ✦
 # Pick an operation on the left, or start typing —
 # autocomplete works once the schema is loaded.
 
-query Countries {
-  countries(filter: { continent: { eq: "EU" } }) {
-    code
-    name
-    emoji
-    capital
-    currency
+query Config {
+  config {
+    cdnDomain
   }
 }
 `
@@ -202,7 +198,7 @@ export const loadTabsFx = createEffect(async (url: string) => {
     // A never-visited workspace starts with a single tab; the demo endpoint gets the welcome query.
     const fallback =
         url === DEFAULT_URL
-            ? createTab(url, { query: WELCOME_QUERY, title: "Countries" })
+            ? createTab(url, { query: WELCOME_QUERY, title: "Config" })
             : createTab(url, { query: "" })
     return { url, tabs: sorted.length ? sorted : [fallback], active }
 })

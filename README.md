@@ -6,6 +6,9 @@ by default.
 
 Drop it into any page with two CDN tags, or use it as a React component.
 
+**[Live demo](https://animaruteam.github.io/graphiplay/)** — the standalone page, opened on the
+Animaru API. Point it at your own URL from the endpoint bar.
+
 ## CDN
 
 ```html
