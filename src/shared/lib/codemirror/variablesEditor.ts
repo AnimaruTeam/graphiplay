@@ -8,8 +8,14 @@ import {
 import { jsonLanguage } from "@codemirror/lang-json"
 import { ensureSyntaxTree, syntaxTree } from "@codemirror/language"
 import { type Diagnostic, linter } from "@codemirror/lint"
-import type { Extension } from "@codemirror/state"
-import { type Tooltip, hoverTooltip } from "@codemirror/view"
+import { type EditorState, type Extension, type Range, StateField } from "@codemirror/state"
+import {
+    Decoration,
+    type DecorationSet,
+    EditorView,
+    type Tooltip,
+    hoverTooltip,
+} from "@codemirror/view"
 import {
     type GraphQLInputType,
     getNamedType,
@@ -140,23 +146,26 @@ function enumValueTooltip(type: GraphQLInputType, value: string, opts: GraphQLHo
 }
 
 export function variablesHover(opts: GraphQLHoverOptions = {}): Extension {
-    return hoverTooltip((view, pos): Tooltip | null => {
-        const ctx = view.state.field(variablesContextField)
-        const doc = view.state.doc.toString()
-        const node = syntaxTree(view.state).resolveInner(pos, 0)
-        let dom: HTMLElement | null = null
+    return hoverTooltip(
+        (view, pos): Tooltip | null => {
+            const ctx = view.state.field(variablesContextField)
+            const doc = view.state.doc.toString()
+            const node = syntaxTree(view.state).resolveInner(pos, 0)
+            let dom: HTMLElement | null = null
 
-        if (node.name === "PropertyName") {
-            const container = containerAt(ctx, pathOf(doc, node))
-            const member = container && memberOf(ctx, container, keyOf(doc, node))
-            dom = member ? memberTooltip(member, opts) : null
-        } else if (node.name === "String") {
-            const type = typeAt(ctx, pathOf(doc, node))
-            dom = type ? enumValueTooltip(type, keyOf(doc, node), opts) : null
-        }
-        if (!dom) return null
-        return { pos: node.from, end: node.to, above: true, create: () => ({ dom }) }
-    })
+            if (node.name === "PropertyName") {
+                const container = containerAt(ctx, pathOf(doc, node))
+                const member = container && memberOf(ctx, container, keyOf(doc, node))
+                dom = member ? memberTooltip(member, opts) : null
+            } else if (node.name === "String") {
+                const type = typeAt(ctx, pathOf(doc, node))
+                dom = type ? enumValueTooltip(type, keyOf(doc, node), opts) : null
+            }
+            if (!dom) return null
+            return { pos: node.from, end: node.to, above: true, create: () => ({ dom }) }
+        },
+        { hideOnChange: true },
+    )
 }
 
 // --- Completion -----------------------------------------------------------------
@@ -430,9 +439,61 @@ function completionSource(cx: CompletionContext): CompletionResult | null {
 
 export const variablesCompletion = jsonLanguage.data.of({ autocomplete: completionSource })
 
+// --- Dimming ----------------------------------------------------------------------
+
+const foreignMark = Decoration.mark({ class: "cm-gql-var-foreign" })
+
+/**
+ * Top-level entries the operation that will run doesn't declare — variables of another
+ * operation, or leftovers of an edited query. Dimmed so the ones actually sent stand out.
+ */
+function dimForeignVariables(state: EditorState): DecorationSet {
+    const ctx = state.field(variablesContextField, false)
+    if (!ctx) return Decoration.none
+    const root = syntaxTree(state).topNode.firstChild
+    if (!root || root.name !== "Object") return Decoration.none
+    const doc = state.doc.toString()
+    const ranges: Range<Decoration>[] = []
+    for (const prop of root.getChildren("Property")) {
+        const nameNode = prop.getChild("PropertyName")
+        if (!nameNode) continue
+        const declared = ctx.vars.get(keyOf(doc, nameNode))
+        // With several operations in the document, only the active one's variables are sent.
+        if (!declared || (ctx.active !== null && !declared.inActive))
+            ranges.push(foreignMark.range(prop.from, prop.to))
+    }
+    return Decoration.set(ranges)
+}
+
+const foreignVariablesField = StateField.define<DecorationSet>({
+    create: dimForeignVariables,
+    update(deco, tr) {
+        if (
+            !tr.docChanged &&
+            syntaxTree(tr.startState) === syntaxTree(tr.state) &&
+            !tr.effects.some(e => e.is(setVariablesContext))
+        )
+            return deco
+        return dimForeignVariables(tr.state)
+    },
+    provide: f => EditorView.decorations.from(f),
+})
+
+// `span` too: the JSON highlight marks nest inside this one and would keep their colour.
+const foreignTheme = EditorView.baseTheme({
+    ".cm-gql-var-foreign, .cm-gql-var-foreign span": { color: "var(--text-3)" },
+})
+
 // --- Bundle -----------------------------------------------------------------------
 
 /** Everything the variables JSON editor needs on top of `json()`. Drive it with `setVariablesContext`. */
 export function variablesSupport(opts: GraphQLHoverOptions = {}): Extension {
-    return [variablesContextField, variablesLinter, variablesHover(opts), variablesCompletion]
+    return [
+        variablesContextField,
+        variablesLinter,
+        variablesHover(opts),
+        variablesCompletion,
+        foreignVariablesField,
+        foreignTheme,
+    ]
 }

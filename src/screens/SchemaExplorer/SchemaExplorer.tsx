@@ -37,7 +37,7 @@ import {
     toastShown,
 } from "@/models"
 import { TypeLink } from "@/screens"
-import { generateOperation } from "@/shared/lib/graphql"
+import { generateOperation, typeGroupClass } from "@/shared/lib/graphql"
 import type { OperationKind } from "@/shared/types"
 
 import styles from "./SchemaExplorer.module.css"
@@ -262,7 +262,9 @@ function RootView({ schema }: { schema: GraphQLSchema }) {
                                 className={styles.row}
                                 onClick={() => push({ kind: "type", name: t.name })}
                             >
-                                <span className={styles.rowName}>{t.name}</span>
+                                <span className={`${styles.rowName} ${typeGroupClass(t)}`}>
+                                    {t.name}
+                                </span>
                                 {t.description && (
                                     <Markdown
                                         mode="inline"
@@ -293,7 +295,7 @@ function TypeView({ schema, name }: { schema: GraphQLSchema; name: string }) {
         <div className={styles.section}>
             <div className={styles.typeHeader}>
                 <span className={styles.typeKindLabel}>{typeKindLabel(type)}</span>
-                <h3 className={styles.typeTitle}>{type.name}</h3>
+                <h3 className={`${styles.typeTitle} ${typeGroupClass(type)}`}>{type.name}</h3>
                 {type.description && (
                     <Markdown source={type.description} className={styles.description} />
                 )}
@@ -614,7 +616,7 @@ function SearchResults({ schema, query }: { schema: GraphQLSchema; query: string
                                 className={styles.row}
                                 onClick={() => push({ kind: "type", name: t.name })}
                             >
-                                <span className={styles.rowName}>
+                                <span className={`${styles.rowName} ${typeGroupClass(t)}`}>
                                     <Highlight text={t.name} q={q} />
                                 </span>
                                 <span className={styles.rowMeta}>{typeKindLabel(t)}</span>
@@ -677,10 +679,11 @@ export function Highlight({ text, q }: { text: string; q: string }) {
 // --- SDL ---------------------------------------------------------------------
 
 function SdlView() {
-    const sdl = useUnit($sdl)
+    const [sdl, schema] = useUnit([$sdl, $schema])
     return (
         <div className={styles.sdl}>
-            <CodeEditor value={sdl} language="graphql" readOnly lineNumbers />
+            {/* The schema resolves type references, so they get the same colours as everywhere else. */}
+            <CodeEditor value={sdl} language="graphql" schema={schema} readOnly lineNumbers />
         </div>
     )
 }

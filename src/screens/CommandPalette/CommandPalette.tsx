@@ -2,6 +2,7 @@ import { useUnit } from "effector-react"
 import {
     BookMarked,
     FolderHeart,
+    Github,
     History,
     KeyRound,
     Layers,
@@ -41,8 +42,9 @@ import {
     tabUpdated,
     toastShown,
 } from "@/models"
-import { generateOperation } from "@/shared/lib/graphql"
+import { generateOperation, typeGroupClass } from "@/shared/lib/graphql"
 import { useIsMobile } from "@/shared/lib/hooks"
+import { REPO_URL } from "@/shared/meta"
 import type { OperationKind } from "@/shared/types"
 
 import styles from "./CommandPalette.module.css"
@@ -51,6 +53,8 @@ interface Item {
     id: string
     group: "Actions" | "Operations" | "Collections" | "Tabs" | "Types"
     label: string
+    /** Extra class for the label — types use it to carry their kind's colour. */
+    labelClass?: string
     hint?: string
     icon?: ReactNode
     kind?: OperationKind
@@ -255,6 +259,17 @@ export function CommandPalette() {
                     openModal({ kind: "endpointSettings" })
                 },
             },
+            {
+                id: "repo",
+                group: "Actions",
+                label: "Graphiplay on GitHub",
+                hint: "source",
+                icon: <Github />,
+                run: () => {
+                    close()
+                    window.open(REPO_URL, "_blank", "noopener,noreferrer")
+                },
+            },
         ]
         for (const t of tabs) {
             out.push({
@@ -335,6 +350,7 @@ export function CommandPalette() {
                     id: `type-${name}`,
                     group: "Types",
                     label: name,
+                    labelClass: typeGroupClass(t),
                     hint: t.constructor.name
                         .replace("GraphQL", "")
                         .replace("Type", "")
@@ -470,7 +486,11 @@ export function CommandPalette() {
                                                     {it.icon ?? <Search />}
                                                 </span>
                                             )}
-                                            <span className={styles.label}>{it.label}</span>
+                                            <span
+                                                className={`${styles.label} ${it.labelClass ?? ""}`}
+                                            >
+                                                {it.label}
+                                            </span>
                                             {it.hint && (
                                                 <span className={styles.hint}>{it.hint}</span>
                                             )}

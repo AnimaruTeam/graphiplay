@@ -9,7 +9,6 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirro
 import { json, jsonParseLinter } from "@codemirror/lang-json"
 import {
     bracketMatching,
-    foldGutter,
     foldKeymap,
     indentOnInput,
     syntaxHighlighting,
@@ -38,7 +37,11 @@ import { type Ref, useEffect, useImperativeHandle, useRef } from "react"
 import {
     type ActiveOperation,
     activeOperation,
+    closeTooltipsOnEscape,
+    completeOnNewline,
+    foldGutterIcons,
     graphqlCompletion,
+    graphqlDecorations,
     graphqlHover,
     jsonHighlightStyle,
     operationFocus,
@@ -153,9 +156,11 @@ export function CodeEditor({
                       // Same set as cm6-graphql's graphql(), with its completion source swapped for ours.
                       graphqlLanguageSupport(),
                       graphqlCompletion,
+                      completeOnNewline,
                       lint,
                       jump,
                       stateExtensions(schema ?? undefined, { showErrorOnInvalidSchema: true }),
+                      graphqlDecorations,
                       graphqlHover({ onTypeClick: name => callbacks.current.onOpenType?.(name) }),
                       operationFocus({
                           onActiveChange: op => callbacks.current.onActiveOperationChange?.(op),
@@ -175,9 +180,7 @@ export function CodeEditor({
                   ]
 
         const extensions: Extension[] = [
-            ...(showLineNumbers
-                ? [lineNumbers(), foldGutter({ openText: "⌄", closedText: "›" })]
-                : []),
+            ...(showLineNumbers ? [lineNumbers(), foldGutterIcons] : []),
             highlightSpecialChars(),
             history(),
             drawSelection(),
@@ -192,6 +195,7 @@ export function CodeEditor({
             highlightActiveLine(),
             highlightActiveLineGutter(),
             highlightSelectionMatches(),
+            closeTooltipsOnEscape,
             keymap.of([
                 {
                     key: "Mod-Enter",
@@ -214,7 +218,10 @@ export function CodeEditor({
                         return true
                     },
                 },
+                // Ctrl-Space is the CodeMirror default, but macOS takes it for input sources —
+                // Alt-Space does the same and stays free in the browser.
                 { key: "Ctrl-Space", run: startCompletion },
+                { key: "Alt-Space", run: startCompletion },
                 ...closeBracketsKeymap,
                 ...defaultKeymap,
                 ...searchKeymap,

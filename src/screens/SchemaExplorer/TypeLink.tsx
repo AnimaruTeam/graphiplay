@@ -1,12 +1,13 @@
 import { useUnit } from "effector-react"
 import { type GraphQLType, getNamedType } from "graphql"
 
-import { docsPushed } from "@/models"
+import { $activePanel, docsPushed, panelSelected } from "@/models"
+import { typeGroupClass } from "@/shared/lib/graphql"
 
 import styles from "./SchemaExplorer.module.css"
 
 export function TypeLink({ type }: { type: GraphQLType }) {
-    const push = useUnit(docsPushed)
+    const [push, activePanel, selectPanel] = useUnit([docsPushed, $activePanel, panelSelected])
     const named = getNamedType(type)
     const str = type.toString()
     const idx = str.indexOf(named.name)
@@ -16,6 +17,9 @@ export function TypeLink({ type }: { type: GraphQLType }) {
     const go = (e: React.SyntheticEvent) => {
         e.stopPropagation()
         push({ kind: "type", name: named.name })
+        // The type opens in the schema panel, which isn't the one being looked at when the link
+        // sits in Operations. Guarded: re-selecting the active panel collapses the sidebar.
+        if (activePanel !== "schema") selectPanel("schema")
     }
     return (
         <span className={styles.typeRef}>
@@ -23,7 +27,7 @@ export function TypeLink({ type }: { type: GraphQLType }) {
             <span
                 role="link"
                 tabIndex={0}
-                className={styles.typeLink}
+                className={`${styles.typeLink} ${typeGroupClass(named)}`}
                 onClick={go}
                 onKeyDown={e => {
                     if (e.key === "Enter" || e.key === " ") {

@@ -43,6 +43,7 @@ import {
     setAllArguments,
     toggleArgument,
     toggleField,
+    typeGroupClass,
 } from "@/shared/lib/graphql"
 import { markdownPlain } from "@/shared/lib/markdown"
 import type { OperationKind } from "@/shared/types"
@@ -282,7 +283,9 @@ function FieldRow({
                     {alias && <span className={styles.alias}>{alias}: </span>}
                     <span className={styles.fieldName}>{field.name}</span>
                     <span className={styles.colon}> : </span>
-                    <span className={styles.type}>{typeLabel(field.type)}</span>
+                    <span className={`${styles.type} ${typeGroupClass(field.type)}`}>
+                        {typeLabel(field.type)}
+                    </span>
                 </span>
             </div>
             {open && expandable && (
@@ -374,7 +377,9 @@ function ArgsGroup({
                                 >
                                     <span className={styles.argName}>{a.name}</span>
                                     <span className={styles.colon}> : </span>
-                                    <span className={styles.type}>{a.type.toString()}</span>
+                                    <span className={`${styles.type} ${typeGroupClass(a.type)}`}>
+                                        {a.type.toString()}
+                                    </span>
                                     {current && (
                                         <span className={styles.preview}>
                                             {argPreview(current)}
@@ -446,7 +451,7 @@ function FragmentRow({ ctx, typeName, path }: { ctx: TreeCtx; typeName: string; 
                 />
                 <span className={styles.label}>
                     <span className={styles.fragmentKw}>... on </span>
-                    <span className={styles.type}>{typeName}</span>
+                    <span className={`${styles.type} ${typeGroupClass(type)}`}>{typeName}</span>
                 </span>
             </div>
             {open && (

@@ -270,7 +270,7 @@
     box-shadow: 0 0 0 2px var(--accent-ring);
 }
 .typeLink:hover {
-    background: var(--query-soft);
+    background: var(--hover);
     text-decoration: underline;
     text-underline-offset: 2px;
 }

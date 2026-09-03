@@ -61,7 +61,14 @@
 
     /* syntax */
     --syn-keyword: #6b47d1;
+    --syn-fragment: #15803d;
     --syn-type: #0e7490;
+    /* Type names by what the schema says they are: blue / emerald / pink, near-primaries so
+       the three read as different colours rather than shades of one. Pink rather than a true
+       rose keeps input types from looking like the red of an error. */
+    --syn-type-scalar: #2563eb;
+    --syn-type-object: #047857;
+    --syn-type-input: #be185d;
     --syn-variable: #b45309;
     --syn-field: #18181b;
     --syn-arg: #5b5bd6;
@@ -120,7 +127,11 @@
     --backdrop: rgba(0, 0, 0, 0.55);
 
     --syn-keyword: #b39cff;
+    --syn-fragment: #7fdba4;
     --syn-type: #6fd3e3;
+    --syn-type-scalar: #93c5fd;
+    --syn-type-object: #6ee7b7;
+    --syn-type-input: #f9a8d4;
     --syn-variable: #f5c96a;
     --syn-field: #ededf0;
     --syn-arg: #b4b8ff;
@@ -191,6 +202,13 @@
 :where(.graphiplay) :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
+}
+/* Text fields mark focus themselves (accent border on the field or its box). The generic ring
+   on top of that draws a square outline inside the rounded control, so keep it off them —
+   buttons and links still get it. There are no checkbox/radio inputs here; excluded anyway. */
+:where(.graphiplay) textarea:focus-visible,
+:where(.graphiplay) input:not([type="checkbox"], [type="radio"]):focus-visible {
+    outline: none;
 }
 :where(.graphiplay) ::selection {
     background: var(--syn-selection);
@@ -295,9 +313,21 @@
     cursor: pointer;
     color: var(--text-3);
     transition: color var(--dur-fast);
+    padding: 0 2px 0 1px;
 }
 .graphiplay .cm-foldGutter .cm-gutterElement:hover {
     color: var(--text);
+}
+/* The marker is an SVG chevron (theme.ts); centre it on the line it belongs to. */
+.graphiplay .cm-foldMarker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+.graphiplay .cm-foldMarker svg {
+    width: 11px;
+    height: 11px;
 }
 .graphiplay .cm-foldPlaceholder {
     background: var(--accent-soft) !important;
@@ -500,6 +530,18 @@
 }
 .graphiplay .cm-gql-hover-typeName {
     color: var(--syn-type);
+}
+/* A type name is painted by what the schema says it is, everywhere one is shown: schema
+   explorer, query builder, command palette, hover docs. Set via `typeGroupClass`; the editor
+   mirrors these colours in its own theme (graphqlDecorations.ts). */
+.graphiplay .gp-t-scalar {
+    color: var(--syn-type-scalar);
+}
+.graphiplay .gp-t-object {
+    color: var(--syn-type-object);
+}
+.graphiplay .gp-t-input {
+    color: var(--syn-type-input);
 }
 .graphiplay .cm-gql-hover-field {
     color: var(--syn-field);

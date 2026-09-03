@@ -1,6 +1,25 @@
-import type { Completion, CompletionContext, CompletionResult } from "@codemirror/autocomplete"
+import {
+    type Completion,
+    type CompletionContext,
+    type CompletionResult,
+    completionStatus,
+    currentCompletions,
+    pickedCompletion,
+    setSelectedCompletion,
+    startCompletion,
+} from "@codemirror/autocomplete"
+import { insertNewlineAndIndent } from "@codemirror/commands"
 import { syntaxTree } from "@codemirror/language"
-import type { ChangeSpec, EditorState, TransactionSpec } from "@codemirror/state"
+import {
+    type ChangeSpec,
+    EditorState,
+    type Extension,
+    Prec,
+    StateEffect,
+    StateField,
+    type TransactionSpec,
+} from "@codemirror/state"
+import { keymap } from "@codemirror/view"
 import { getOpts, getSchema, graphqlLanguage, offsetToPos } from "cm6-graphql"
 import { type GraphQLSchema, getNamedType } from "graphql"
 import {
@@ -24,7 +43,13 @@ type SyntaxNode = ReturnType<typeof syntaxTree>["topNode"]
  * (no `$$id`), variables of the argument's type are ranked first, and the variable's type is shown.
  */
 
-const TRIGGER = /^[a-zA-Z0-9_@(]$/
+const TRIGGER = /^[a-zA-Z0-9_@]$/
+/**
+ * Punctuation that opens a spot where an argument can be written: the `(` of an argument
+ * list and the `,` between arguments. The list pops up there without waiting for a letter.
+ * A selection set's `{` is deliberately not here — see `completeOnNewline`.
+ */
+const OPENING = /[(,]\s*$/
 
 function kindToType(kind: CompletionItem["kind"]): string | undefined {
     switch (kind) {
@@ -140,7 +165,8 @@ function schemaCompletions(
     const word = ctx.matchBefore(/\w*/)
     if (!word) return null
     const last = word.text.at(-1)
-    if ((!last || !TRIGGER.test(last)) && !ctx.explicit) return null
+    const opening = !last && OPENING.test(ctx.state.sliceDoc(Math.max(0, ctx.pos - 40), ctx.pos))
+    if (!ctx.explicit && !opening && (!last || !TRIGGER.test(last))) return null
 
     const items = getAutocompleteSuggestions(
         schema,
@@ -161,6 +187,108 @@ function schemaCompletions(
         })),
     }
 }
+
+// --- Newline inside a selection set ------------------------------------------------
+
+/** Nodes that mean the cursor is in a value / argument slot, not where a field goes. */
+const NOT_A_FIELD = new Set([
+    "Arguments",
+    "VariableDefinitions",
+    "ObjectValue",
+    "ListValue",
+    "StringValue",
+    "Comment",
+])
+
+function inSelectionSet(state: EditorState): boolean {
+    const { head, empty } = state.selection.main
+    if (!empty) return false
+    for (
+        let node: SyntaxNode | null = syntaxTree(state).resolveInner(head, -1);
+        node;
+        node = node.parent
+    ) {
+        if (node.name === "SelectionSet") {
+            // Strictly between the braces. Right after a closing `}` that set is finished —
+            // an enclosing one may still be open, so keep walking up rather than accepting.
+            // A set with no `}` yet counts as open however far the parser stretched it.
+            if (head > node.from && (head < node.to || node.lastChild?.name !== "}")) return true
+        } else if (NOT_A_FIELD.has(node.name)) return false
+    }
+    return false
+}
+
+/** Label of the completion accepted most recently, so the next list can carry on below it. */
+const lastAccepted = StateField.define<string | null>({
+    create: () => null,
+    update: (value, tr) => tr.annotation(pickedCompletion)?.label ?? value,
+})
+
+/** Raised while Enter's list is on its way; the results arrive a query later. */
+const armSelection = StateEffect.define<boolean>()
+
+const arming = StateField.define<boolean>({
+    create: () => false,
+    update(value, tr) {
+        for (const e of tr.effects) if (e.is(armSelection)) return e.value
+        // Typing means the user is filtering the list, not walking down it.
+        return value && !tr.docChanged
+    },
+})
+
+/**
+ * Selecting fields is a walk down the list: take `id`, break the line, and the one you want
+ * next is `name` — not `id` again. So the list that opens on Enter starts on the entry after
+ * the one just taken, leaving its order untouched.
+ *
+ * The selection has to ride along in the very transaction that opens the list. Setting it
+ * afterwards means the popup renders once around the first entry and then jumps; the tooltip
+ * even picks which slice of a long list to render from the selection it is built with.
+ */
+const continueBelowPicked = EditorState.transactionExtender.of(tr => {
+    if (!tr.startState.field(arming, false)) return null
+    // The state this transaction is about to produce — reading it here is what allows the
+    // selection to be part of it instead of a follow-up.
+    const status = completionStatus(tr.state)
+    if (status === "pending") return null
+    if (status !== "active") return { effects: armSelection.of(false) }
+    const label = tr.state.field(lastAccepted)
+    const options = currentCompletions(tr.state)
+    const next = label ? options.findIndex(o => o.label === label) + 1 : 0
+    const effects: StateEffect<unknown>[] = [armSelection.of(false)]
+    // Not in this list, or it was the last entry: leave the default selection alone.
+    if (next >= 1 && next < options.length) effects.push(setSelectedCompletion(next))
+    return { effects }
+})
+
+/**
+ * Breaking a line inside `{ … }` is the moment you ask "what can I write here?", so the field
+ * list opens there — typing the brace itself doesn't, it would cover the text being written.
+ * Raised above the default Enter binding; the completion popup's own Enter (accept the
+ * highlighted option) sits higher still, so an open list keeps priority.
+ */
+export const completeOnNewline: Extension = [
+    lastAccepted,
+    arming,
+    continueBelowPicked,
+    Prec.high(
+        keymap.of([
+            {
+                key: "Enter",
+                run: view => {
+                    if (completionStatus(view.state) === "active") return false
+                    // Read before the edit: the tree is current for the document as it stands.
+                    const open = inSelectionSet(view.state)
+                    if (!insertNewlineAndIndent(view)) return false
+                    if (!open) return true
+                    view.dispatch({ effects: armSelection.of(true) })
+                    startCompletion(view)
+                    return true
+                },
+            },
+        ]),
+    ),
+]
 
 export const graphqlCompletion = graphqlLanguage.data.of({
     autocomplete(ctx: CompletionContext): CompletionResult | null {

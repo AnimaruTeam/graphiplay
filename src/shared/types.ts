@@ -84,6 +84,8 @@ export interface ResponseState {
     size: number | null
     error?: string
     events?: string[]
+    /** Headers the server sent back; empty for subscriptions and failed requests. */
+    headers?: Record<string, string>
 }
 
 export interface UiSettings {

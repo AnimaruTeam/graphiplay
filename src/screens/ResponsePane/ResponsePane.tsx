@@ -1,5 +1,15 @@
 import { useUnit } from "effector-react"
-import { AlertTriangle, Check, Copy, Radio, Sparkles, Trash2, Zap } from "lucide-react"
+import {
+    AlertTriangle,
+    Braces,
+    Check,
+    Copy,
+    KeyRound,
+    Radio,
+    Sparkles,
+    Trash2,
+    Zap,
+} from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useState } from "react"
 
@@ -17,9 +27,16 @@ export function ResponsePane() {
         toastShown,
     ])
     const [copied, setCopied] = useState(false)
+    const [view, setView] = useState<"body" | "headers">("body")
+
+    const headers = Object.entries(res.headers ?? {})
+    // Subscriptions and network failures carry no headers; the tab disappears with them.
+    const shown = view === "headers" && headers.length ? "headers" : "body"
 
     const copy = async () => {
-        await navigator.clipboard.writeText(res.body)
+        await navigator.clipboard.writeText(
+            shown === "headers" ? JSON.stringify(res.headers ?? {}, null, 2) : res.body,
+        )
         setCopied(true)
         setTimeout(() => setCopied(false), 1400)
     }
@@ -80,10 +97,35 @@ export function ResponsePane() {
                     )}
                 </AnimatePresence>
                 <div className={styles.spacer} />
-                {hasBody && (
+                {headers.length > 0 && (
+                    <div className={styles.tabs}>
+                        <button
+                            className={`${styles.tab} ${shown === "body" ? styles.tabActive : ""}`}
+                            onClick={() => setView("body")}
+                        >
+                            <Braces />
+                            <span className={styles.tabText}>Body</span>
+                        </button>
+                        <button
+                            className={`${styles.tab} ${shown === "headers" ? styles.tabActive : ""}`}
+                            onClick={() => setView("headers")}
+                        >
+                            <KeyRound />
+                            <span className={styles.tabText}>Headers</span>
+                            <span className={styles.count}>{headers.length}</span>
+                        </button>
+                    </div>
+                )}
+                {(hasBody || shown === "headers") && (
                     <>
                         <IconButton
-                            label={copied ? "Copied" : "Copy response"}
+                            label={
+                                copied
+                                    ? "Copied"
+                                    : shown === "headers"
+                                      ? "Copy headers"
+                                      : "Copy response"
+                            }
                             size="sm"
                             onClick={copy}
                         >
@@ -126,7 +168,16 @@ export function ResponsePane() {
                     )}
                 </AnimatePresence>
 
-                {hasBody ? (
+                {shown === "headers" ? (
+                    <div className={styles.headers}>
+                        {headers.map(([key, value]) => (
+                            <div className={styles.headerRow} key={key}>
+                                <span className={styles.headerKey}>{key}</span>
+                                <span className={styles.headerValue}>{value}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : hasBody ? (
                     <div className={styles.editor}>
                         <CodeEditor value={res.body} language="json" readOnly />
                     </div>

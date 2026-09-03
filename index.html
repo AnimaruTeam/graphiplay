@@ -2,23 +2,21 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <!-- maximum-scale=1 stops iOS from zooming into the 13px editor/URL inputs on focus;
-             interactive-widget makes 100dvh shrink with the on-screen keyboard. -->
         <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
         />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#1a1a1d" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#ffffff" />
         <meta name="mobile-web-app-capable" content="yes" />
         <title>Graphiplay</title>
         <script>
-            // Apply the last resolved theme before first paint to avoid a flash.
             try {
                 var t = localStorage.getItem("gp-theme")
                 if (t !== "light" && t !== "dark")
                     t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
                 document.documentElement.dataset.theme = t
+                document.querySelector('meta[name="theme-color"]').content =
+                    t === "dark" ? "#1a1a1d" : "#ffffff"
             } catch (e) {}
         </script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />

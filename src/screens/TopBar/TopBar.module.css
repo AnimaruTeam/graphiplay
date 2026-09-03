@@ -14,9 +14,49 @@
 
 .brand {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13.5px;
     letter-spacing: -0.01em;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: var(--radius-s);
+    padding: 2px 0;
+    transition: color var(--dur);
+}
+.brandName {
+    padding: 0 3px;
+}
+/* Braces sit like punctuation in the editor and pull apart when you point at the mark. */
+.brace {
+    color: var(--syn-punct);
+    transition:
+        color var(--dur),
+        transform var(--dur);
+}
+.brand:hover .brace,
+.brand:focus-visible .brace {
+    color: var(--accent);
+}
+.brand:hover .brace:first-child,
+.brand:focus-visible .brace:first-child {
+    transform: translateX(-2px);
+}
+.brand:hover .brace:last-child,
+.brand:focus-visible .brace:last-child {
+    transform: translateX(2px);
+}
+@media (prefers-reduced-motion: reduce) {
+    .brace {
+        transition: color var(--dur);
+    }
+    .brand:hover .brace,
+    .brand:focus-visible .brace {
+        transform: none;
+    }
 }
 
 .center {
@@ -83,6 +123,8 @@
     border: 0;
     outline: none;
     font-family: var(--font-mono);
+    /* JetBrains Mono ligates `://` and `//` — in a URL that reads as a slash gone missing. */
+    font-variant-ligatures: none;
     font-size: 12.5px;
     color: var(--text);
 }
@@ -106,10 +148,14 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 260px;
+    /* Room for the longest normal status: "Schema loaded · 10:24:51 AM · polling every 30s". */
+    max-width: 420px;
 }
+/* Errors are arbitrary length — cap them so they can't eat the URL field. Full text is in
+   the status dot's tooltip either way. */
 .status_error {
     color: var(--danger);
+    max-width: 260px;
 }
 .status_ok {
     color: var(--text-3);
@@ -254,6 +300,7 @@
 .menuItemUrl {
     font-size: 11px;
     font-family: var(--font-mono);
+    font-variant-ligatures: none;
     color: var(--text-3);
     white-space: nowrap;
     overflow: hidden;

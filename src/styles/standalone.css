@@ -5,6 +5,18 @@ body,
     height: 100%;
     margin: 0;
 }
+/* The page under the playground, which Safari samples for its bars alongside the theme-color
+ * meta — left at the default it shows white around the app. Mirrors --surface in global.css:
+ * the top bar and the phone rail are what the browser's bars sit against, and matching --bg
+ * leaves them a shade darker than the app. `data-theme` is set before first paint. */
+html {
+    background: #ffffff;
+    color-scheme: light;
+}
+html[data-theme="dark"] {
+    background: #1a1a1d;
+    color-scheme: dark;
+}
 body {
     overflow: hidden;
     /* App-like feel on touch: no pull-to-refresh over the editor. */

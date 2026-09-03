@@ -17,6 +17,8 @@ export interface HttpResult {
     size: number
     body: unknown
     text: string
+    /** Response headers the browser exposes (cross-origin: only the CORS-safelisted ones). */
+    headers: Record<string, string>
 }
 
 export async function executeHttp(params: ExecuteParams): Promise<HttpResult> {
@@ -43,7 +45,11 @@ export async function executeHttp(params: ExecuteParams): Promise<HttpResult> {
     } catch {
         body = { __raw: text }
     }
-    return { status: res.status, durationMs, size: new Blob([text]).size, body, text }
+    const headers: Record<string, string> = {}
+    res.headers.forEach((value, key) => {
+        headers[key] = value
+    })
+    return { status: res.status, durationMs, size: new Blob([text]).size, body, text, headers }
 }
 
 export type SubscriptionTransport = "ws" | "sse"

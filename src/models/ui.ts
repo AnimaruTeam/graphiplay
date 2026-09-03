@@ -130,7 +130,9 @@ $docsStack
     .on(docsPopped, stack => (stack.length > 1 ? stack.slice(0, -1) : stack))
     .on(docsJumped, (stack, idx) => stack.slice(0, idx + 1))
     .reset(docsReset)
-$docsSearch.on(docsSearchChanged, (_, v) => v).reset(docsReset)
+// Navigating ends the search: the results replace whatever node is current, so a type opened
+// while a query is still in the box would never come into view.
+$docsSearch.on(docsSearchChanged, (_, v) => v).reset(docsReset, docsPushed, docsPopped, docsJumped)
 
 export const $docsCurrent = $docsStack.map(s => s[s.length - 1])
 

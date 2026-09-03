@@ -27,6 +27,7 @@ import {
     getTypeInfo,
 } from "graphql-language-service"
 
+import { typeGroupClass } from "@/shared/lib/graphql"
 import { markdownElement, markdownSummary } from "@/shared/lib/markdown"
 
 type AllTypeInfo = ReturnType<typeof getTypeInfo>
@@ -53,7 +54,7 @@ export function renderType(t: GraphQLType, opts: GraphQLHoverOptions): HTMLEleme
     const idx = str.indexOf(named.name)
     const wrap = el("span", "cm-gql-hover-type")
     if (idx > 0) wrap.append(text(str.slice(0, idx), "cm-gql-hover-punct"))
-    const name = text(named.name, "cm-gql-hover-typeName")
+    const name = text(named.name, `cm-gql-hover-typeName ${typeGroupClass(named)}`)
     if (opts.onTypeClick) {
         name.classList.add("cm-gql-hover-link")
         name.title = `Open ${named.name} in schema`
@@ -406,6 +407,8 @@ export function graphqlHover(opts: GraphQLHoverOptions = {}): Extension {
             if (!dom) return null
             return { pos: word.from, end: word.to, above: true, create: () => ({ dom }) }
         },
-        { hoverTime: 250 },
+        // Typing dismisses the tooltip: it describes the token that was under the pointer,
+        // which the edit has already moved or changed.
+        { hoverTime: 250, hideOnChange: true },
     )
 }

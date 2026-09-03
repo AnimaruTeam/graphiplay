@@ -40,6 +40,7 @@ import {
     urlCommitted,
 } from "@/models"
 import { useMediaQuery } from "@/shared/lib/hooks"
+import { REPO_URL } from "@/shared/meta"
 
 import styles from "./TopBar.module.css"
 
@@ -119,7 +120,23 @@ export function TopBar() {
 
     return (
         <header className={styles.bar}>
-            <div className={styles.brand}>Graphiplay</div>
+            {/* The wordmark as a selection set — the smallest possible GraphQL query, and the
+                way to the source. The braces open up on hover like the editor's own folding. */}
+            <a
+                className={styles.brand}
+                href={REPO_URL}
+                target="_blank"
+                rel="noreferrer noopener"
+                title="Graphiplay — source on GitHub"
+            >
+                <span className={styles.brace} aria-hidden="true">
+                    {"{"}
+                </span>
+                <span className={styles.brandName}>graphiplay</span>
+                <span className={styles.brace} aria-hidden="true">
+                    {"}"}
+                </span>
+            </a>
 
             <div className={styles.center}>
                 <div className={`${styles.urlBox} ${styles[status]}`}>

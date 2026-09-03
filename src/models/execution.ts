@@ -181,6 +181,7 @@ const runFx = createEffect(
                     httpStatus: res.status,
                     durationMs: res.durationMs,
                     size: res.size,
+                    headers: res.headers,
                 },
             })
             record(ok, res.status)

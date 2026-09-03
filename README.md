@@ -79,15 +79,16 @@ Good to know:
   drill into fields and arguments, search across the schema, view the whole SDL.
 - **Operations panel** — every query / mutation / subscription with a generated preview; insert into
   the editor or open in a new tab.
-- **Editor** — GraphQL autocompletion, linting, folding, hover docs, prettify, multi‑operation
-  picker. Variables are type‑checked against the query: unused keys dimmed, missing or invalid
-  values flagged with quick fixes.
+- **Editor** — GraphQL autocompletion, linting, folding, hover docs (`Esc` dismisses them),
+  prettify, multi‑operation picker. Operation keywords and type names are colour‑coded by kind.
+  Variables are type‑checked against the query: keys the running operation doesn't declare are
+  greyed out, missing or invalid values flagged with quick fixes.
 - **Tabs** — drag to reorder, drag onto a collection to save, right‑click for run / rename /
   duplicate / save / close.
-- **Response** — highlighted JSON, HTTP status, duration, size. Subscriptions stream live over
-  WebSocket or SSE.
-- **Collections** — save operations (query + variables + headers) into color‑coded collections;
-  tabs stay linked so `⌘S` updates the saved item.
+- **Response** — highlighted JSON, HTTP status, duration, size, and a Headers tab with everything
+  the server sent back. Subscriptions stream live over WebSocket or SSE.
+- **Collections** — save operations (query + variables + headers) into color‑coded collections; tabs
+  stay linked so `⌘S` updates the saved item.
 - **History** — the last 200 requests, grouped by day, one click to replay.
 - **Command palette** (`⌘K`) — jump to operations, types, collections, tabs and actions.
 - **Responsive** — editor and response stack when the workspace is narrow; on phones panels move to
@@ -103,3 +104,4 @@ Good to know:
 | `⌘/Ctrl B`        | Toggle sidebar                          |
 | `Shift Alt F`     | Prettify                                |
 | `Alt T` / `Alt W` | New / close tab                         |
+| `Alt Space`       | Suggest fields & types at the cursor    |
