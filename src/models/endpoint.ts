@@ -4,6 +4,7 @@ import { nanoid } from "nanoid"
 import { db, kv, workspaceKey } from "@/shared/db"
 import {
     DEFAULT_URL,
+    type RequestCompression,
     type SubscriptionTransport,
     createHeader,
     normalizeEndpointUrl,
@@ -14,10 +15,17 @@ import type { Endpoint, HeaderEntry } from "@/shared/types"
 export interface WorkspaceSettings {
     wsUrl: string
     transport: SubscriptionTransport
+    /** Content-Encoding for operation request bodies (introspection always goes uncompressed). */
+    compression: RequestCompression
     headers: HeaderEntry[]
 }
 
-const DEFAULT_WORKSPACE: WorkspaceSettings = { wsUrl: "", transport: "ws", headers: [] }
+const DEFAULT_WORKSPACE: WorkspaceSettings = {
+    wsUrl: "",
+    transport: "ws",
+    compression: "none",
+    headers: [],
+}
 
 /** The URL input is a draft; `$url` follows every keystroke. */
 export const urlChanged = createEvent<string>()
@@ -25,6 +33,7 @@ export const urlChanged = createEvent<string>()
 export const urlCommitted = createEvent()
 export const wsUrlChanged = createEvent<string>()
 export const transportChanged = createEvent<SubscriptionTransport>()
+export const compressionChanged = createEvent<RequestCompression>()
 
 export const persistentHeaderAdded = createEvent()
 export const persistentHeaderChanged = createEvent<{ id: string; patch: Partial<HeaderEntry> }>()
@@ -48,12 +57,14 @@ export const $workspaceUrl = createStore(DEFAULT_URL)
 export const workspaceSwitched = createEvent<string>()
 export const $wsUrl = createStore("")
 export const $transport = createStore<SubscriptionTransport>("ws")
+export const $compression = createStore<RequestCompression>("none")
 export const $persistentHeaders = createStore<HeaderEntry[]>([])
 export const $endpoints = createStore<Endpoint[]>([])
 
 $url.on(urlChanged, (_, v) => v)
 $wsUrl.on(wsUrlChanged, (_, v) => v)
 $transport.on(transportChanged, (_, v) => v)
+$compression.on(compressionChanged, (_, v) => v)
 
 sample({
     clock: urlCommitted,
@@ -82,7 +93,8 @@ async function readWorkspaceSettings(
     endpoints: Endpoint[],
 ): Promise<WorkspaceSettings> {
     const stored = await kv.get<WorkspaceSettings | null>(workspaceKey("settings", url), null)
-    if (stored) return stored
+    // Settings stored by older versions lack the fields added since.
+    if (stored) return { ...DEFAULT_WORKSPACE, ...stored }
     const saved = endpoints.find(e => normalizeEndpointUrl(e.url) === url)
     return saved
         ? {
@@ -123,6 +135,7 @@ const settingsLoaded = sample({
 })
 $wsUrl.on(settingsLoaded, (_, s) => s.wsUrl)
 $transport.on(settingsLoaded, (_, s) => s.transport)
+$compression.on(settingsLoaded, (_, s) => s.compression)
 $persistentHeaders.on(settingsLoaded, (_, s) => s.headers)
 
 const saveUrlFx = createEffect((url: string) => kv.set("endpoint", { url }))
@@ -156,11 +169,12 @@ const $settingsLoading = combine(
     (loaded, pending) => !loaded || pending,
 )
 sample({
-    clock: [$wsUrl, $transport, $persistentHeaders],
+    clock: [$wsUrl, $transport, $compression, $persistentHeaders],
     source: {
         url: $workspaceUrl,
         wsUrl: $wsUrl,
         transport: $transport,
+        compression: $compression,
         headers: $persistentHeaders,
     },
     filter: $settingsLoading.map(p => !p),

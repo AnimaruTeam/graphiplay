@@ -16,6 +16,7 @@ import { useState } from "react"
 import { CodeEditor, IconButton } from "@/components"
 import { $activeResponse, $activeTab, responseCleared, toastShown } from "@/models"
 import { formatBytes, formatMs } from "@/shared/lib/graphql"
+import type { BodyCompression, ResponseState } from "@/shared/types"
 
 import styles from "./ResponsePane.module.css"
 
@@ -81,13 +82,34 @@ export function ResponsePane() {
                             {res.durationMs != null && (
                                 <span className={styles.stat}>{formatMs(res.durationMs)}</span>
                             )}
-                            {res.size != null && (
-                                <span className={styles.stat}>
-                                    {res.events
-                                        ? `${res.size} event${res.size === 1 ? "" : "s"}`
-                                        : formatBytes(res.size)}
-                                </span>
-                            )}
+                            {res.size != null &&
+                                (res.events ? (
+                                    <span className={styles.stat}>
+                                        {res.size} event{res.size === 1 ? "" : "s"}
+                                    </span>
+                                ) : (
+                                    <>
+                                        <span className={styles.stat} title={transferTitle(res)}>
+                                            {formatBytes(res.size)}
+                                            {res.responseCompression?.encodedSize != null && (
+                                                <span className={styles.wire}>
+                                                    {" → "}
+                                                    {formatBytes(
+                                                        res.responseCompression.encodedSize,
+                                                    )}
+                                                </span>
+                                            )}
+                                        </span>
+                                        {res.responseCompression && (
+                                            <span
+                                                className={styles.encoding}
+                                                title={transferTitle(res)}
+                                            >
+                                                {res.responseCompression.encoding}
+                                            </span>
+                                        )}
+                                    </>
+                                ))}
                             {res.status === "streaming" && res.events && (
                                 <span className={styles.stat}>
                                     {res.events.length} event{res.events.length === 1 ? "" : "s"}
@@ -231,4 +253,25 @@ export function ResponsePane() {
             </div>
         </div>
     )
+}
+
+function transferTitle(res: ResponseState): string | undefined {
+    const lines: string[] = []
+    if (res.responseCompression) lines.push(`Response: ${describe(res.responseCompression)}`)
+    if (res.requestCompression) lines.push(`Request: ${describe(res.requestCompression)}`)
+    return lines.length ? lines.join("\n") : undefined
+}
+
+function describe({ encoding, size, encodedSize }: BodyCompression): string {
+    const how =
+        encoding === "compressed"
+            ? "compressed (Content-Encoding not exposed by the server)"
+            : encoding
+    if (encodedSize == null) {
+        return `${formatBytes(size)}, ${how}; size on the wire not exposed by the server`
+    }
+    const change = size > 0 ? Math.round((1 - encodedSize / size) * 100) : 0
+    return `${formatBytes(size)} → ${formatBytes(encodedSize)} ${how} (${
+        change >= 0 ? `${change}% smaller` : `${-change}% larger`
+    })`
 }

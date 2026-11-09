@@ -2,6 +2,7 @@ import { createEffect, createEvent, createStore, sample } from "effector"
 import { nanoid } from "nanoid"
 
 import {
+    type RequestCompression,
     type SubscriptionTransport,
     executeHttp,
     mergeHeaders,
@@ -12,7 +13,7 @@ import {
 } from "@/shared/lib/graphql"
 import type { ExecutionResult, HeaderEntry, ResponseState, Tab } from "@/shared/types"
 
-import { $persistentHeaders, $transport, $workspaceUrl, $wsUrl } from "./endpoint"
+import { $compression, $persistentHeaders, $transport, $workspaceUrl, $wsUrl } from "./endpoint"
 import { historyAdded } from "./history"
 import { $activeTab, $tabs } from "./tabs"
 
@@ -58,12 +59,21 @@ interface RunParams {
     url: string
     wsUrl: string
     transport: SubscriptionTransport
+    compression: RequestCompression
     persistentHeaders: HeaderEntry[]
     operationName: string | null | undefined
 }
 
 const runFx = createEffect(
-    async ({ tab, url, wsUrl, transport, persistentHeaders, operationName }: RunParams) => {
+    async ({
+        tab,
+        url,
+        wsUrl,
+        transport,
+        compression,
+        persistentHeaders,
+        operationName,
+    }: RunParams) => {
         controllers.get(tab.id)?.()
         controllers.delete(tab.id)
 
@@ -112,6 +122,7 @@ const runFx = createEffect(
                 variables: vars.value,
                 operationName: opName,
                 headers,
+                compression,
                 onNext: (result: ExecutionResult) => {
                     count += 1
                     eventAppended({ tabId: tab.id, event: JSON.stringify(result, null, 2) })
@@ -159,6 +170,7 @@ const runFx = createEffect(
                 variables: vars.value,
                 operationName: opName,
                 headers,
+                compression,
                 signal: controller.signal,
             })
             if (!isCurrent()) return
@@ -182,6 +194,8 @@ const runFx = createEffect(
                     durationMs: res.durationMs,
                     size: res.size,
                     headers: res.headers,
+                    requestCompression: res.requestCompression,
+                    responseCompression: res.responseCompression,
                 },
             })
             record(ok, res.status)
@@ -219,9 +233,13 @@ sample({
         url: $workspaceUrl,
         wsUrl: $wsUrl,
         transport: $transport,
+        compression: $compression,
         persistentHeaders: $persistentHeaders,
     },
-    fn: ({ tabs, active, url, wsUrl, transport, persistentHeaders }, payload): RunParams | null => {
+    fn: (
+        { tabs, active, url, wsUrl, transport, compression, persistentHeaders },
+        payload,
+    ): RunParams | null => {
         const tab =
             payload && payload.tabId ? (tabs.find(t => t.id === payload.tabId) ?? null) : active
         if (!tab) return null
@@ -230,6 +248,7 @@ sample({
             url: url.trim(),
             wsUrl: wsUrl.trim(),
             transport,
+            compression,
             persistentHeaders,
             operationName: payload ? payload.operationName : undefined,
         }

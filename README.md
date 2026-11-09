@@ -68,6 +68,9 @@ Good to know:
   container.
 - **Fonts.** Designed for Inter + JetBrains Mono, falls back to system fonts. Add a Google Fonts
   link for the intended look.
+- **Compression details cross-origin.** The browser only reveals a response's `Content-Encoding` if
+  the server lists it in `Access-Control-Expose-Headers`, and its size on the wire with
+  `Timing-Allow-Origin` or a `Content-Length`. Otherwise the pane shows less, never wrong numbers.
 - **Storage is per origin.** Tabs, collections and history for an endpoint are shared between every
   page on the same origin that embeds the playground.
 
@@ -88,8 +91,11 @@ Good to know:
   greyed out, missing or invalid values flagged with quick fixes.
 - **Tabs** — drag to reorder, drag onto a collection to save, right‑click for run / rename /
   duplicate / save / close.
-- **Response** — highlighted JSON, HTTP status, duration, size, and a Headers tab with everything
-  the server sent back. Subscriptions stream live over WebSocket or SSE.
+- **Response** — highlighted JSON, HTTP status, duration, size with the encoding and the bytes on
+  the wire when it came compressed (gzip, br, zstd…), and a Headers tab with everything the server
+  sent back. Subscriptions stream live over WebSocket or SSE.
+- **Request compression** — per endpoint, gzip or deflate the body of queries, mutations and SSE
+  subscriptions (`Content-Encoding`). Off by default: the server has to accept compressed bodies.
 - **Collections** — save operations (query + variables + headers) into color‑coded collections; tabs
   stay linked so `⌘S` updates the saved item.
 - **History** — the last 200 requests, grouped by day, one click to replay.

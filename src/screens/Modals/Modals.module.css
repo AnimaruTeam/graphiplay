@@ -118,8 +118,12 @@
         color var(--dur),
         box-shadow var(--dur);
 }
-.segment:hover {
+.segment:hover:not(:disabled) {
     color: var(--text);
+}
+.segment:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 .segmentActive {
     background: var(--surface);

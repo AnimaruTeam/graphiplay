@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { Button, Field, Input, Kbd, Modal, Switch, altKey, modKey } from "@/components"
 import {
     $collections,
+    $compression,
     $items,
     $modal,
     $schemaPollInterval,
@@ -20,6 +21,7 @@ import {
     collectionCreatedDone,
     collectionRecolored,
     collectionRenamed,
+    compressionChanged,
     itemRenamed,
     itemSaved,
     itemSavedDone,
@@ -31,7 +33,12 @@ import {
     transportChanged,
     wsUrlChanged,
 } from "@/models"
-import { deriveWsUrl, guessTitle } from "@/shared/lib/graphql"
+import {
+    REQUEST_COMPRESSIONS,
+    canCompressRequests,
+    deriveWsUrl,
+    guessTitle,
+} from "@/shared/lib/graphql"
 
 import styles from "./Modals.module.css"
 
@@ -433,6 +440,7 @@ function EndpointSettings({ open, onClose }: { open: boolean; onClose: () => voi
         wsUrlChanged,
         transportChanged,
     ])
+    const [compression, setCompression] = useUnit([$compression, compressionChanged])
     const [polling, pollInterval, setPolling, setPollInterval] = useUnit([
         $schemaPolling,
         $schemaPollInterval,
@@ -443,7 +451,7 @@ function EndpointSettings({ open, onClose }: { open: boolean; onClose: () => voi
         <Modal
             open={open}
             title="Endpoint settings"
-            description="Subscriptions transport and schema polling for the current endpoint."
+            description="Request compression, subscriptions transport and schema polling for the current endpoint."
             onClose={onClose}
             width={500}
             footer={
@@ -456,7 +464,30 @@ function EndpointSettings({ open, onClose }: { open: boolean; onClose: () => voi
                 <Field label="HTTP endpoint">
                     <Input value={url} readOnly className={styles.readonly} />
                 </Field>
-                <Field label="Subscriptions transport">
+                <Field
+                    label="Request compression"
+                    group
+                    hint={
+                        canCompressRequests
+                            ? "Compresses query, mutation and SSE request bodies and sends Content-Encoding. The server has to accept it; introspection always goes uncompressed."
+                            : "This browser can't compress request bodies (no CompressionStream)."
+                    }
+                >
+                    <div className={styles.segmented}>
+                        {REQUEST_COMPRESSIONS.map(c => (
+                            <button
+                                key={c}
+                                type="button"
+                                disabled={!canCompressRequests}
+                                className={`${styles.segment} ${compression === c ? styles.segmentActive : ""}`}
+                                onClick={() => setCompression(c)}
+                            >
+                                {c === "none" ? "Off" : c}
+                            </button>
+                        ))}
+                    </div>
+                </Field>
+                <Field label="Subscriptions transport" group>
                     <div className={styles.segmented}>
                         {(["ws", "sse"] as const).map(t => (
                             <button
@@ -501,7 +532,7 @@ function EndpointSettings({ open, onClose }: { open: boolean; onClose: () => voi
                     />
                 </div>
                 {polling && (
-                    <Field label="Poll interval">
+                    <Field label="Poll interval" group>
                         <div className={styles.segmented}>
                             {SCHEMA_POLL_INTERVALS.map(s => (
                                 <button

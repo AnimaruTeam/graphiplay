@@ -1,6 +1,14 @@
 import { type Client, createClient } from "graphql-ws"
 
-import type { ExecutionResult } from "@/shared/types"
+import type { BodyCompression, ExecutionResult } from "@/shared/types"
+
+import {
+    type RequestCompression,
+    encodeBody,
+    responseCompression,
+    watchResourceTiming,
+    withContentEncoding,
+} from "./compression"
 
 export interface ExecuteParams {
     url: string
@@ -9,6 +17,8 @@ export interface ExecuteParams {
     operationName?: string | null
     headers: Record<string, string>
     signal?: AbortSignal
+    /** Content-Encoding for the request body. */
+    compression?: RequestCompression
 }
 
 export interface HttpResult {
@@ -19,37 +29,67 @@ export interface HttpResult {
     text: string
     /** Response headers the browser exposes (cross-origin: only the CORS-safelisted ones). */
     headers: Record<string, string>
+    /** How the request body went out; null when it was sent as is. */
+    requestCompression: BodyCompression | null
+    /** How the response body came in; null when it wasn't compressed or nothing tells. */
+    responseCompression: BodyCompression | null
 }
 
-export async function executeHttp(params: ExecuteParams): Promise<HttpResult> {
-    const started = performance.now()
-    const res = await fetch(params.url, {
-        method: "POST",
-        headers: {
-            "content-type": "application/json",
-            accept: "application/graphql-response+json, application/json",
-            ...params.headers,
-        },
-        body: JSON.stringify({
+function encodeOperation(params: ExecuteParams) {
+    return encodeBody(
+        JSON.stringify({
             query: params.query,
             variables: params.variables ?? {},
             operationName: params.operationName ?? undefined,
         }),
-        signal: params.signal,
-    })
-    const text = await res.text()
-    const durationMs = performance.now() - started
-    let body: unknown
+        params.compression ?? "none",
+    )
+}
+
+export async function executeHttp(params: ExecuteParams): Promise<HttpResult> {
+    const payload = await encodeOperation(params)
+    const timing = watchResourceTiming(params.url)
     try {
-        body = JSON.parse(text)
-    } catch {
-        body = { __raw: text }
+        const started = performance.now()
+        const res = await fetch(params.url, {
+            method: "POST",
+            headers: withContentEncoding(
+                {
+                    "content-type": "application/json",
+                    accept: "application/graphql-response+json, application/json",
+                    ...params.headers,
+                },
+                payload.compression?.encoding,
+            ),
+            body: payload.body,
+            signal: params.signal,
+        })
+        const text = await res.text()
+        const durationMs = performance.now() - started
+        let body: unknown
+        try {
+            body = JSON.parse(text)
+        } catch {
+            body = { __raw: text }
+        }
+        const headers: Record<string, string> = {}
+        res.headers.forEach((value, key) => {
+            headers[key] = value
+        })
+        const size = new Blob([text]).size
+        return {
+            status: res.status,
+            durationMs,
+            size,
+            body,
+            text,
+            headers,
+            requestCompression: payload.compression,
+            responseCompression: responseCompression(res, timing.entry(), size),
+        }
+    } finally {
+        timing.stop()
     }
-    const headers: Record<string, string> = {}
-    res.headers.forEach((value, key) => {
-        headers[key] = value
-    })
-    return { status: res.status, durationMs, size: new Blob([text]).size, body, text, headers }
 }
 
 export type SubscriptionTransport = "ws" | "sse"
@@ -127,18 +167,18 @@ function subscribeSse(params: SubscribeParams): () => void {
     const controller = new AbortController()
     ;(async () => {
         try {
+            const payload = await encodeOperation(params)
             const res = await fetch(params.url, {
                 method: "POST",
-                headers: {
-                    "content-type": "application/json",
-                    accept: "text/event-stream",
-                    ...params.headers,
-                },
-                body: JSON.stringify({
-                    query: params.query,
-                    variables: params.variables ?? {},
-                    operationName: params.operationName ?? undefined,
-                }),
+                headers: withContentEncoding(
+                    {
+                        "content-type": "application/json",
+                        accept: "text/event-stream",
+                        ...params.headers,
+                    },
+                    payload.compression?.encoding,
+                ),
+                body: payload.body,
                 signal: controller.signal,
             })
             if (!res.ok || !res.body) {

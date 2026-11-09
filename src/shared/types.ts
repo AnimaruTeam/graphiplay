@@ -76,6 +76,15 @@ export interface ExecutionResult {
     extensions?: unknown
 }
 
+export interface BodyCompression {
+    /** gzip, br, zstd… — "compressed" when the server hides its Content-Encoding header. */
+    encoding: string
+    /** Decoded size in bytes. */
+    size: number
+    /** Size on the wire; null when the browser doesn't tell. */
+    encodedSize: number | null
+}
+
 export interface ResponseState {
     status: "idle" | "loading" | "success" | "error" | "streaming"
     body: string
@@ -86,6 +95,8 @@ export interface ResponseState {
     events?: string[]
     /** Headers the server sent back; empty for subscriptions and failed requests. */
     headers?: Record<string, string>
+    requestCompression?: BodyCompression | null
+    responseCompression?: BodyCompression | null
 }
 
 export interface UiSettings {

@@ -24,18 +24,31 @@ export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputEleme
 export function Field({
     label,
     hint,
+    group,
     children,
 }: {
     label: string
     hint?: string
+    /**
+     * The control is a set of buttons (a segmented choice). A `<label>` would hand its name
+     * and its clicks to the first button, so clicking the label or the hint would select it.
+     */
+    group?: boolean
     children: ReactNode
 }) {
-    return (
-        <label className={styles.field}>
+    const content = (
+        <>
             <span className={styles.fieldLabel}>{label}</span>
             {children}
             {hint && <span className={styles.fieldHint}>{hint}</span>}
-        </label>
+        </>
+    )
+    return group ? (
+        <div className={styles.field} role="group" aria-label={label}>
+            {content}
+        </div>
+    ) : (
+        <label className={styles.field}>{content}</label>
     )
 }
 

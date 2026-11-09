@@ -1,4 +1,5 @@
 export * from "./builder"
+export * from "./compression"
 export * from "./document"
 export * from "./endpoint"
 export * from "./execute"
