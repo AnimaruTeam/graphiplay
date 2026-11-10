@@ -218,6 +218,73 @@
     min-height: 0;
 }
 
+.apqWrap {
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.apq {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 6px 0 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    white-space: nowrap;
+}
+.apqIcon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--text-3);
+}
+.apqLabel {
+    font-weight: 600;
+    color: var(--text-2);
+}
+.apqOutcome {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-3);
+    background: var(--surface-2);
+    cursor: default;
+}
+.apqOutcome.success {
+    color: var(--success);
+    background: var(--success-soft);
+}
+.apqOutcome.accent {
+    color: var(--accent);
+    background: var(--accent-soft);
+}
+.apqOutcome.danger {
+    color: var(--danger);
+    background: var(--danger-soft);
+}
+/* Long hashes lose their middle, not the end people compare by. */
+.apqHash {
+    display: flex;
+    min-width: 0;
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-2);
+    user-select: text;
+}
+.apqHashHead {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.apq > :global(button) {
+    flex-shrink: 0;
+}
+
 .error {
     overflow: hidden;
     flex-shrink: 0;

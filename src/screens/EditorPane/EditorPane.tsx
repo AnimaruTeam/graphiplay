@@ -1,5 +1,14 @@
 import { useUnit } from "effector-react"
-import { Braces, ChevronDown, ChevronUp, Eraser, KeyRound, Save, Sparkles } from "lucide-react"
+import {
+    Braces,
+    ChevronDown,
+    ChevronUp,
+    Eraser,
+    Fingerprint,
+    KeyRound,
+    Save,
+    Sparkles,
+} from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 
@@ -128,7 +137,7 @@ export function EditorPane() {
         if (activePanel !== "schema" || sidebarCollapsed) selectPanel("schema")
     }
 
-    const { namedOps, multi, selectedOp } = useRunTarget(tab)
+    const { namedOps, multi, selectedOp, kind } = useRunTarget(tab)
 
     // Variables that won't coerce against the query's declarations (unused keys are only warnings).
     const varsProblem = useMemo(() => {
@@ -202,6 +211,20 @@ export function EditorPane() {
             <div className={styles.toolbar}>
                 {/* On phones Run sits in the Query/Response switcher (Workspace) so it's reachable from both views. */}
                 {!isMobile && <RunButton />}
+                <IconButton
+                    label={
+                        kind === "subscription"
+                            ? "Run as persisted query (APQ): queries and mutations only"
+                            : "Run as persisted query (APQ)"
+                    }
+                    className={styles.apq}
+                    disabled={isRunning || kind === "subscription"}
+                    onClick={() =>
+                        run({ tabId: tab.id, operationName: selectedOp, persisted: true })
+                    }
+                >
+                    <Fingerprint />
+                </IconButton>
 
                 <AnimatePresence>
                     {multi && (

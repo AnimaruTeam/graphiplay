@@ -9,6 +9,7 @@ import {
     parseOperations,
     persistentHeadersForTab,
     safeParseJson,
+    sha256Hex,
     subscribe,
 } from "@/shared/lib/graphql"
 import type { ExecutionResult, HeaderEntry, ResponseState, Tab } from "@/shared/types"
@@ -25,7 +26,12 @@ const IDLE: ResponseState = {
     size: null,
 }
 
-export const runRequested = createEvent<{ tabId?: string; operationName?: string | null } | void>()
+export const runRequested = createEvent<{
+    tabId?: string
+    operationName?: string | null
+    /** Send as an Automatic Persisted Query (queries and mutations only). */
+    persisted?: boolean
+} | void>()
 export const stopRequested = createEvent<string>()
 export const responseCleared = createEvent<string>()
 
@@ -62,6 +68,7 @@ interface RunParams {
     compression: RequestCompression
     persistentHeaders: HeaderEntry[]
     operationName: string | null | undefined
+    persisted: boolean
 }
 
 const runFx = createEffect(
@@ -73,6 +80,7 @@ const runFx = createEffect(
         compression,
         persistentHeaders,
         operationName,
+        persisted,
     }: RunParams) => {
         controllers.get(tab.id)?.()
         controllers.delete(tab.id)
@@ -107,6 +115,18 @@ const runFx = createEffect(
                 ok,
                 createdAt: Date.now(),
             })
+
+        if (kind === "subscription" && persisted) {
+            responseSet({
+                tabId: tab.id,
+                state: {
+                    ...IDLE,
+                    status: "error",
+                    error: "Persisted queries go out over HTTP — run queries and mutations this way, not subscriptions.",
+                },
+            })
+            return
+        }
 
         if (kind === "subscription") {
             responseSet({
@@ -163,7 +183,15 @@ const runFx = createEffect(
         // must not touch the response state or the controllers map.
         const isCurrent = () => controllers.get(tab.id) === abort
         responseSet({ tabId: tab.id, state: { ...IDLE, status: "loading" } })
+        // Kept for the error state: the hash is worth seeing even when the request never got through.
+        let persistedQuery: ResponseState["persistedQuery"] = null
         try {
+            if (persisted) {
+                const hash = await sha256Hex(tab.query)
+                if (!isCurrent()) return
+                persistedQuery = { hash, outcome: null, requests: 0 }
+                responsePatched({ tabId: tab.id, patch: { persistedQuery } })
+            }
             const res = await executeHttp({
                 url,
                 query: tab.query,
@@ -172,6 +200,7 @@ const runFx = createEffect(
                 headers,
                 compression,
                 signal: controller.signal,
+                persistedQueryHash: persistedQuery?.hash,
             })
             if (!isCurrent()) return
             const body = res.body as ExecutionResult
@@ -196,6 +225,7 @@ const runFx = createEffect(
                     headers: res.headers,
                     requestCompression: res.requestCompression,
                     responseCompression: res.responseCompression,
+                    persistedQuery: res.persistedQuery,
                 },
             })
             record(ok, res.status)
@@ -211,6 +241,7 @@ const runFx = createEffect(
                 state: {
                     ...IDLE,
                     status: "error",
+                    persistedQuery,
                     error:
                         err.message === "Failed to fetch"
                             ? "Network error — check the URL, CORS policy and that the server is reachable."
@@ -251,6 +282,7 @@ sample({
             compression,
             persistentHeaders,
             operationName: payload ? payload.operationName : undefined,
+            persisted: !!(payload && payload.persisted),
         }
     },
 }).watch(params => {

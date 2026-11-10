@@ -35,6 +35,9 @@
     display: flex;
     gap: 3px;
 }
+.apq {
+    margin-left: 4px;
+}
 
 .opPicker {
     position: relative;
@@ -207,6 +210,7 @@
         height: 40px;
         padding: 0 6px;
     }
+    .apq,
     .opPicker {
         margin-left: 0;
     }

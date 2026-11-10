@@ -1,6 +1,6 @@
 import { type Client, createClient } from "graphql-ws"
 
-import type { BodyCompression, ExecutionResult } from "@/shared/types"
+import type { BodyCompression, ExecutionResult, PersistedQuery } from "@/shared/types"
 
 import {
     type RequestCompression,
@@ -9,6 +9,7 @@ import {
     watchResourceTiming,
     withContentEncoding,
 } from "./compression"
+import { persistedQueryError, persistedQueryExtension } from "./persisted"
 
 export interface ExecuteParams {
     url: string
@@ -19,6 +20,11 @@ export interface ExecuteParams {
     signal?: AbortSignal
     /** Content-Encoding for the request body. */
     compression?: RequestCompression
+    /**
+     * Send as an Automatic Persisted Query under this SHA-256 of `query`: the hash alone first,
+     * the query text too only when the server doesn't know the hash. HTTP only.
+     */
+    persistedQueryHash?: string
 }
 
 export interface HttpResult {
@@ -33,21 +39,55 @@ export interface HttpResult {
     requestCompression: BodyCompression | null
     /** How the response body came in; null when it wasn't compressed or nothing tells. */
     responseCompression: BodyCompression | null
+    /** Set when the operation went out as an Automatic Persisted Query. */
+    persistedQuery: PersistedQuery | null
 }
 
-function encodeOperation(params: ExecuteParams) {
+function encodeOperation(params: ExecuteParams, withQuery = true) {
+    const hash = params.persistedQueryHash
     return encodeBody(
         JSON.stringify({
-            query: params.query,
+            query: withQuery ? params.query : undefined,
             variables: params.variables ?? {},
             operationName: params.operationName ?? undefined,
+            extensions: hash ? persistedQueryExtension(hash) : undefined,
         }),
         params.compression ?? "none",
     )
 }
 
 export async function executeHttp(params: ExecuteParams): Promise<HttpResult> {
-    const payload = await encodeOperation(params)
+    const hash = params.persistedQueryHash
+    if (!hash) return post(params, true)
+
+    const started = performance.now()
+    const first = await post(params, false)
+    const verdict = persistedQueryError(first.body)
+    if (verdict !== "not-found") {
+        const outcome =
+            verdict === "not-supported" ? "unsupported" : executed(first.body) ? "hit" : "rejected"
+        return { ...first, persistedQuery: { hash, outcome, requests: 1 } }
+    }
+    const second = await post(params, true)
+    return {
+        ...second,
+        // What the client waited: the miss costs a round trip.
+        durationMs: performance.now() - started,
+        persistedQuery: {
+            hash,
+            outcome: executed(second.body) ? "registered" : "rejected",
+            requests: 2,
+        },
+    }
+}
+
+/** A response with a `data` entry means execution started; request errors come without it. */
+function executed(body: unknown): boolean {
+    return !!body && typeof body === "object" && "data" in body
+}
+
+async function post(params: ExecuteParams, withQuery: boolean): Promise<HttpResult> {
+    const payload = await encodeOperation(params, withQuery)
     const timing = watchResourceTiming(params.url)
     try {
         const started = performance.now()
@@ -86,6 +126,7 @@ export async function executeHttp(params: ExecuteParams): Promise<HttpResult> {
             headers,
             requestCompression: payload.compression,
             responseCompression: responseCompression(res, timing.entry(), size),
+            persistedQuery: null,
         }
     } finally {
         timing.stop()

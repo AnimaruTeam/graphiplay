@@ -4,6 +4,7 @@ import {
     Braces,
     Check,
     Copy,
+    Fingerprint,
     KeyRound,
     Radio,
     Sparkles,
@@ -16,7 +17,7 @@ import { useState } from "react"
 import { CodeEditor, IconButton } from "@/components"
 import { $activeResponse, $activeTab, responseCleared, toastShown } from "@/models"
 import { formatBytes, formatMs } from "@/shared/lib/graphql"
-import type { BodyCompression, ResponseState } from "@/shared/types"
+import type { BodyCompression, PersistedQuery, ResponseState } from "@/shared/types"
 
 import styles from "./ResponsePane.module.css"
 
@@ -162,6 +163,22 @@ export function ResponsePane() {
 
             <div className={styles.body}>
                 <AnimatePresence initial={false}>
+                    {res.persistedQuery && (
+                        <motion.div
+                            key="apq"
+                            className={styles.apqWrap}
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                        >
+                            <PersistedQueryBar
+                                query={res.persistedQuery}
+                                pending={res.status === "loading"}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <AnimatePresence initial={false}>
                     {res.error && (
                         <motion.div
                             key="error"
@@ -251,6 +268,66 @@ export function ResponsePane() {
                     </div>
                 )}
             </div>
+        </div>
+    )
+}
+
+const OUTCOMES = {
+    hit: {
+        label: "Hit",
+        tone: "success",
+        title: "The server had this hash stored and ran the query from it: one request, no query text sent.",
+    },
+    registered: {
+        label: "Registered",
+        tone: "accent",
+        title: "The server didn't know the hash (PersistedQueryNotFound), so the query text went in a second request and is now stored under it. Run as APQ again for a hit.",
+    },
+    unsupported: {
+        label: "Not supported",
+        tone: "danger",
+        title: "The server has persisted queries switched off (PersistedQueryNotSupported).",
+    },
+    rejected: {
+        label: "Rejected",
+        tone: "danger",
+        title: "The server answered with an error instead of running the query; the response says why. A server without APQ support usually asks for the query text.",
+    },
+} as const
+
+/** Hash of the query sent as an Automatic Persisted Query, and what the server made of it. */
+function PersistedQueryBar({ query, pending }: { query: PersistedQuery; pending: boolean }) {
+    const [copied, setCopied] = useState(false)
+    const outcome = query.outcome ? OUTCOMES[query.outcome] : null
+    const copy = async () => {
+        await navigator.clipboard.writeText(query.hash)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1400)
+    }
+    return (
+        <div className={styles.apq}>
+            <Fingerprint className={styles.apqIcon} />
+            <span className={styles.apqLabel}>APQ</span>
+            {outcome ? (
+                <span
+                    className={`${styles.apqOutcome} ${styles[outcome.tone]}`}
+                    title={`${outcome.title}\n${query.requests} request${query.requests === 1 ? "" : "s"}`}
+                >
+                    {outcome.label}
+                </span>
+            ) : (
+                pending && <span className={styles.apqOutcome}>Sending…</span>
+            )}
+            <span
+                className={styles.apqHash}
+                title={`SHA-256 of the query text as sent\n${query.hash}`}
+            >
+                <span className={styles.apqHashHead}>{query.hash.slice(0, -8)}</span>
+                <span>{query.hash.slice(-8)}</span>
+            </span>
+            <IconButton label={copied ? "Copied" : "Copy hash"} size="sm" onClick={copy}>
+                {copied ? <Check /> : <Copy />}
+            </IconButton>
         </div>
     )
 }

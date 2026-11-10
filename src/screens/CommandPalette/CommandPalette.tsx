@@ -1,6 +1,7 @@
 import { useUnit } from "effector-react"
 import {
     BookMarked,
+    Fingerprint,
     FolderHeart,
     Github,
     History,
@@ -134,6 +135,16 @@ export function CommandPalette() {
                 run: () => {
                     close()
                     run()
+                },
+            },
+            {
+                id: "run-persisted",
+                group: "Actions",
+                label: "Run as persisted query (APQ)",
+                icon: <Fingerprint />,
+                run: () => {
+                    close()
+                    run({ persisted: true })
                 },
             },
             {

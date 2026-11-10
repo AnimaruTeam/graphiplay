@@ -71,6 +71,9 @@ Good to know:
 - **Compression details cross-origin.** The browser only reveals a response's `Content-Encoding` if
   the server lists it in `Access-Control-Expose-Headers`, and its size on the wire with
   `Timing-Allow-Origin` or a `Content-Length`. Otherwise the pane shows less, never wrong numbers.
+- **APQ hashes are of the editor text.** The hash is taken over the query exactly as written. Apollo
+  Client hashes its own printed document (with `__typename` added), so an app can send a different
+  hash for the same operation.
 - **Storage is per origin.** Tabs, collections and history for an endpoint are shared between every
   page on the same origin that embeds the playground.
 
@@ -96,6 +99,10 @@ Good to know:
   sent back. Subscriptions stream live over WebSocket or SSE.
 - **Request compression** — per endpoint, gzip or deflate the body of queries, mutations and SSE
   subscriptions (`Content-Encoding`). Off by default: the server has to accept compressed bodies.
+- **Persisted queries (APQ)** — the fingerprint button next to Run sends a query or mutation as an
+  Automatic Persisted Query: its SHA-256 hash alone first, the query text only if the server answers
+  `PersistedQueryNotFound`. The response pane shows the hash (click to copy) and whether the server
+  already had it, stored it now, or doesn't support persisted queries.
 - **Collections** — save operations (query + variables + headers) into color‑coded collections; tabs
   stay linked so `⌘S` updates the saved item.
 - **History** — the last 200 requests, grouped by day, one click to replay.
